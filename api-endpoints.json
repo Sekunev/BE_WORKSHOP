@@ -1,0 +1,357 @@
+{
+  "timestamp": "2025-09-24T17:46:12.189Z",
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/register",
+      "summary": "POST /register",
+      "tags": [
+        "auth"
+      ],
+      "access": "Private",
+      "routeName": "auth"
+    },
+    {
+      "method": "POST",
+      "path": "/login",
+      "summary": "POST /login",
+      "tags": [
+        "auth"
+      ],
+      "access": "Private",
+      "routeName": "auth"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "summary": "GET /me",
+      "tags": [
+        "auth"
+      ],
+      "access": "Private",
+      "routeName": "auth"
+    },
+    {
+      "method": "PUT",
+      "path": "/change-password",
+      "summary": "PUT /change-password",
+      "tags": [
+        "auth"
+      ],
+      "access": "Private",
+      "routeName": "auth"
+    },
+    {
+      "method": "GET",
+      "path": "/",
+      "summary": "GET /",
+      "tags": [
+        "blog"
+      ],
+      "access": "Private/Admin",
+      "routeName": "blog"
+    },
+    {
+      "method": "GET",
+      "path": "/:slug",
+      "summary": "GET /:slug",
+      "tags": [
+        "blog"
+      ],
+      "access": "Private/Admin",
+      "routeName": "blog"
+    },
+    {
+      "method": "POST",
+      "path": "/",
+      "summary": "POST /",
+      "tags": [
+        "blog"
+      ],
+      "access": "Private/Admin",
+      "routeName": "blog"
+    },
+    {
+      "method": "PUT",
+      "path": "/:id",
+      "summary": "PUT /:id",
+      "tags": [
+        "blog"
+      ],
+      "access": "Private/Admin",
+      "routeName": "blog"
+    },
+    {
+      "method": "DELETE",
+      "path": "/:id",
+      "summary": "DELETE /:id",
+      "tags": [
+        "blog"
+      ],
+      "access": "Private/Admin",
+      "routeName": "blog"
+    },
+    {
+      "method": "GET",
+      "path": "/my-blogs",
+      "summary": "GET /my-blogs",
+      "tags": [
+        "blog"
+      ],
+      "access": "Private/Admin",
+      "routeName": "blog"
+    },
+    {
+      "method": "POST",
+      "path": "/:id/like",
+      "summary": "POST /:id/like",
+      "tags": [
+        "blog"
+      ],
+      "access": "Private/Admin",
+      "routeName": "blog"
+    },
+    {
+      "method": "GET",
+      "path": "/categories",
+      "summary": "GET /categories",
+      "tags": [
+        "blog"
+      ],
+      "access": "Private/Admin",
+      "routeName": "blog"
+    },
+    {
+      "method": "GET",
+      "path": "/tags",
+      "summary": "GET /tags",
+      "tags": [
+        "blog"
+      ],
+      "access": "Private/Admin",
+      "routeName": "blog"
+    },
+    {
+      "method": "GET",
+      "path": "/",
+      "summary": "GET /",
+      "tags": [
+        "user"
+      ],
+      "access": "Private/Admin",
+      "routeName": "user"
+    },
+    {
+      "method": "GET",
+      "path": "/:id",
+      "summary": "GET /:id",
+      "tags": [
+        "user"
+      ],
+      "access": "Private/Admin",
+      "routeName": "user"
+    },
+    {
+      "method": "PUT",
+      "path": "/profile",
+      "summary": "PUT /profile",
+      "tags": [
+        "user"
+      ],
+      "access": "Private/Admin",
+      "routeName": "user"
+    },
+    {
+      "method": "DELETE",
+      "path": "/:id",
+      "summary": "DELETE /:id",
+      "tags": [
+        "user"
+      ],
+      "access": "Private/Admin",
+      "routeName": "user"
+    },
+    {
+      "method": "GET",
+      "path": "/:id/blogs",
+      "summary": "GET /:id/blogs",
+      "tags": [
+        "user"
+      ],
+      "access": "Private/Admin",
+      "routeName": "user"
+    }
+  ],
+  "models": [
+    {
+      "name": "Blog",
+      "fields": [
+        {
+          "name": "title",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "content",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "excerpt",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "author",
+          "type": "Mixed",
+          "required": true
+        },
+        {
+          "name": "category",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "featuredImage",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "isPublished",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "publishedAt",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "viewCount",
+          "type": "Number",
+          "required": false
+        },
+        {
+          "name": "likeCount",
+          "type": "Number",
+          "required": false
+        },
+        {
+          "name": "commentCount",
+          "type": "Number",
+          "required": false
+        },
+        {
+          "name": "readingTime",
+          "type": "Number",
+          "required": false
+        },
+        {
+          "name": "slug",
+          "type": "String",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "Comment",
+      "fields": [
+        {
+          "name": "content",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "author",
+          "type": "Mixed",
+          "required": true
+        },
+        {
+          "name": "blog",
+          "type": "Mixed",
+          "required": true
+        },
+        {
+          "name": "parentComment",
+          "type": "Mixed",
+          "required": false
+        },
+        {
+          "name": "isApproved",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "likeCount",
+          "type": "Number",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "fields": [
+        {
+          "name": "name",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "email",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "password",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "role",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "avatar",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "bio",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "isActive",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "lastLogin",
+          "type": "Date",
+          "required": false
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "totalEndpoints": 18,
+    "totalModels": 3,
+    "totalMiddlewares": 3,
+    "endpointsByMethod": {
+      "POST": 4,
+      "GET": 9,
+      "PUT": 3,
+      "DELETE": 2
+    },
+    "endpointsByAccess": {
+      "Private": 4,
+      "Private/Admin": 14
+    },
+    "endpointsByRoute": {
+      "auth": 4,
+      "blog": 9,
+      "user": 5
+    }
+  }
+}
