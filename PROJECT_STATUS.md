@@ -1,6 +1,6 @@
 # 📊 Proje Durumu Raporu
 
-> Son güncelleme: 24.09.2025 20:46:12
+> Son güncelleme: 24.09.2025 22:05:57
 
 ## 📈 Genel İstatistikler
 
@@ -189,4 +189,4 @@ Bu dokümantasyon otomatik olarak oluşturulmuştur. Yeni endpoint eklediğinizd
 
 ---
 
-*Bu rapor 24.09.2025 20:46:12 tarihinde otomatik oluşturulmuştur.*
+*Bu rapor 24.09.2025 22:05:57 tarihinde otomatik oluşturulmuştur.*

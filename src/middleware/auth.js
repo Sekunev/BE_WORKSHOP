@@ -5,6 +5,7 @@ const User = require('../models/User');
 const protect = async (req, res, next) => {
   let token;
 
+  // Authorization header'ını kontrol et
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
       // Token'ı Bearer'dan ayır
@@ -26,14 +27,28 @@ const protect = async (req, res, next) => {
       next();
     } catch (error) {
       console.error('Token doğrulama hatası:', error);
+      
+      // JWT hata türlerine göre mesaj döndür
+      if (error.name === 'JsonWebTokenError') {
+        return res.status(401).json({
+          status: 'error',
+          message: 'Geçersiz token'
+        });
+      }
+      
+      if (error.name === 'TokenExpiredError') {
+        return res.status(401).json({
+          status: 'error',
+          message: 'Token süresi dolmuş'
+        });
+      }
+
       return res.status(401).json({
         status: 'error',
         message: 'Yetkilendirme başarısız'
       });
     }
-  }
-
-  if (!token) {
+  } else {
     return res.status(401).json({
       status: 'error',
       message: 'Token bulunamadı, erişim reddedildi'

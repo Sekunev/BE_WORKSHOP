@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+
 const User = require('../models/User');
 
 // @desc    Kullanıcı kayıt
@@ -23,8 +25,9 @@ const register = async (req, res, next) => {
       password
     });
 
-    // Token oluştur
-    const token = user.getSignedJwtToken();
+    // Token'ları oluştur
+    const tokenData = user.getSignedJwtToken();
+    const refreshTokenData = user.getRefreshToken();
 
     res.status(201).json({
       status: 'success',
@@ -37,7 +40,15 @@ const register = async (req, res, next) => {
           role: user.role,
           avatar: user.avatar
         },
-        token
+        accessToken: {
+          token: tokenData.token,
+          expiresAt: tokenData.expiresAt,
+          expiresIn: tokenData.expiresIn
+        },
+        refreshToken: {
+          token: refreshTokenData.refreshToken,
+          expiresAt: refreshTokenData.expiresAt
+        }
       }
     });
   } catch (error) {
@@ -84,8 +95,9 @@ const login = async (req, res, next) => {
     user.lastLogin = new Date();
     await user.save();
 
-    // Token oluştur
-    const token = user.getSignedJwtToken();
+    // Token'ları oluştur
+    const tokenData = user.getSignedJwtToken();
+    const refreshTokenData = user.getRefreshToken();
 
     res.status(200).json({
       status: 'success',
@@ -99,7 +111,15 @@ const login = async (req, res, next) => {
           avatar: user.avatar,
           lastLogin: user.lastLogin
         },
-        token
+        accessToken: {
+          token: tokenData.token,
+          expiresAt: tokenData.expiresAt,
+          expiresIn: tokenData.expiresIn
+        },
+        refreshToken: {
+          token: refreshTokenData.refreshToken,
+          expiresAt: refreshTokenData.expiresAt
+        }
       }
     });
   } catch (error) {
@@ -165,9 +185,80 @@ const changePassword = async (req, res, next) => {
   }
 };
 
+// @desc    Refresh token
+// @route   POST /api/auth/refresh
+// @access  Public
+const refreshToken = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Refresh token gereklidir'
+      });
+    }
+
+    // Refresh token'ı doğrula
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    
+    if (decoded.type !== 'refresh') {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Geçersiz refresh token'
+      });
+    }
+
+    // Kullanıcıyı bul
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Kullanıcı bulunamadı'
+      });
+    }
+
+    // Yeni token'ları oluştur
+    const tokenData = user.getSignedJwtToken();
+    const refreshTokenData = user.getRefreshToken();
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Token yenilendi',
+      data: {
+        accessToken: {
+          token: tokenData.token,
+          expiresAt: tokenData.expiresAt,
+          expiresIn: tokenData.expiresIn
+        },
+        refreshToken: {
+          token: refreshTokenData.refreshToken,
+          expiresAt: refreshTokenData.expiresAt
+        }
+      }
+    });
+  } catch (error) {
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Geçersiz refresh token'
+      });
+    }
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Refresh token süresi dolmuş'
+      });
+    }
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   getMe,
-  changePassword
+  changePassword,
+  refreshToken
 };

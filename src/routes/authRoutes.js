@@ -1,6 +1,6 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { register, login, getMe, changePassword } = require('../controllers/authController');
+const { register, login, getMe, changePassword, refreshToken } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 const handleValidationErrors = require('../middleware/validation');
 
@@ -168,6 +168,31 @@ router.post('/login', [
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
+/**
+ * @swagger
+ * /api/auth/debug:
+ *   get:
+ *     summary: Debug token bilgileri
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Token debug bilgileri
+ */
+router.get('/debug', protect, (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Token geçerli',
+    data: {
+      user: req.user,
+      headers: {
+        authorization: req.headers.authorization ? 'Mevcut' : 'Yok'
+      }
+    }
+  });
+});
+
 router.get('/me', protect, getMe);
 
 /**
@@ -213,5 +238,57 @@ router.put('/change-password', protect, [
     .isLength({ min: 6 })
     .withMessage('Yeni şifre en az 6 karakter olmalıdır')
 ], handleValidationErrors, changePassword);
+
+/**
+ * @swagger
+ * /api/auth/refresh:
+ *   post:
+ *     summary: Refresh token
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *     responses:
+ *       200:
+ *         description: Token başarıyla yenilendi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "Token yenilendi"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     accessToken:
+ *                       type: object
+ *                     refreshToken:
+ *                       type: object
+ *       401:
+ *         description: Geçersiz refresh token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.post('/refresh', [
+  body('refreshToken')
+    .notEmpty()
+    .withMessage('Refresh token gereklidir')
+], handleValidationErrors, refreshToken);
 
 module.exports = router;

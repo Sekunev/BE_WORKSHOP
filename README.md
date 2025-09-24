@@ -161,7 +161,69 @@ npm run users:delete admin@user.com
 
 ### Mevcut Admin Kullanıcıları
 - **admin@example.com** / admin123456
-- **admin@user.com** (Abdullah AHLATLI)
+- **admin@user.com** / 123456 (Abdullah AHLATLI)
+
+## 📮 Postman API Test
+
+### Postman Collection Kurulumu
+1. **Postman'i indirin**: [postman.com](https://www.postman.com/downloads/)
+2. **Collection'ı import edin**: `postman/Blog_API_Collection.json`
+3. **Environment'ı import edin**: `postman/Blog_API_Environment.json`
+4. **Environment'ı aktif hale getirin**
+5. **Server'ı başlatın**: `npm run dev`
+
+### Test Sırası
+1. **Health Check** - Server durumunu kontrol et
+2. **Login** - Admin kullanıcısı ile giriş yap
+3. **Get Me** - Profil bilgilerini getir
+4. **Get All Blogs** - Blog listesini getir
+5. **Get Blog by Slug** - Tek blog detayını getir
+6. **Get Categories** - Blog kategorilerini getir
+7. **Get Popular Tags** - Popüler etiketleri getir
+8. **Create Blog** - Yeni blog oluştur
+
+### Test Verileri
+```bash
+# Test blog verilerini oluştur
+npm run seed
+```
+
+Bu komut 5 adet test blogu oluşturur:
+- Node.js ile Modern Backend Geliştirme
+- React ile Modern Frontend Geliştirme
+- MongoDB Veritabanı Tasarımı
+- Docker ile Containerization
+- JavaScript ES6+ Özellikleri
+
+### Token Yönetimi
+- Login sonrası `accessToken` ve `refreshToken` otomatik kaydedilir
+- Token süresi: **7 gün** (access), **30 gün** (refresh)
+- Token yenileme: `POST /api/auth/refresh`
+
+### Örnek Login Response
+```json
+{
+  "status": "success",
+  "message": "Giriş başarılı",
+  "data": {
+    "user": {
+      "id": "68d43bb0700e941df8e4b488",
+      "name": "Abdullah AHLATLI",
+      "email": "admin@user.com",
+      "role": "admin"
+    },
+    "accessToken": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "expiresAt": "2025-10-01T19:13:31.030Z",
+      "expiresIn": "7d"
+    },
+    "refreshToken": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "expiresAt": "2025-10-24T19:13:31.030Z"
+    }
+  }
+}
+```
 
 ## 📖 API Dokümantasyonu
 

@@ -58,6 +58,76 @@ router.get('/', getBlogs);
 
 /**
  * @swagger
+ * /api/blogs/categories:
+ *   get:
+ *     summary: Blog kategorilerini getir
+ *     tags: [Blogs]
+ *     responses:
+ *       200:
+ *         description: Kategoriler başarıyla getirildi
+ */
+router.get('/categories', getCategories);
+
+/**
+ * @swagger
+ * /api/blogs/tags:
+ *   get:
+ *     summary: Popüler etiketleri getir
+ *     tags: [Blogs]
+ *     responses:
+ *       200:
+ *         description: Etiketler başarıyla getirildi
+ */
+router.get('/tags', getPopularTags);
+
+/**
+ * @swagger
+ * /api/blogs/{slug}:
+ *   get:
+ *     summary: Tek blog getir
+ *     tags: [Blogs]
+ *     parameters:
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Blog slug
+ *     responses:
+ *       200:
+ *         description: Blog başarıyla getirildi
+ *       404:
+ *         description: Blog bulunamadı
+ */
+/**
+ * @swagger
+ * /api/blogs/my-blogs:
+ *   get:
+ *     summary: Kullanıcının kendi bloglarını getir
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Sayfa numarası
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Sayfa başına kayıt sayısı
+ *     responses:
+ *       200:
+ *         description: Bloglar başarıyla getirildi
+ */
+router.get('/my-blogs', protect, getMyBlogs);
+
+/**
+ * @swagger
  * /api/blogs/{slug}:
  *   get:
  *     summary: Tek blog getir
@@ -214,33 +284,6 @@ router.delete('/:id', protect, deleteBlog);
 
 /**
  * @swagger
- * /api/blogs/my-blogs:
- *   get:
- *     summary: Kullanıcının kendi bloglarını getir
- *     tags: [Blogs]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *         description: Sayfa numarası
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *         description: Sayfa başına kayıt sayısı
- *     responses:
- *       200:
- *         description: Bloglar başarıyla getirildi
- */
-router.get('/my-blogs', protect, getMyBlogs);
-
-/**
- * @swagger
  * /api/blogs/{id}/like:
  *   post:
  *     summary: Blog beğen
@@ -261,29 +304,5 @@ router.get('/my-blogs', protect, getMyBlogs);
  *         description: Blog bulunamadı
  */
 router.post('/:id/like', protect, likeBlog);
-
-/**
- * @swagger
- * /api/blogs/categories:
- *   get:
- *     summary: Blog kategorilerini getir
- *     tags: [Blogs]
- *     responses:
- *       200:
- *         description: Kategoriler başarıyla getirildi
- */
-router.get('/categories', getCategories);
-
-/**
- * @swagger
- * /api/blogs/tags:
- *   get:
- *     summary: Popüler etiketleri getir
- *     tags: [Blogs]
- *     responses:
- *       200:
- *         description: Etiketler başarıyla getirildi
- */
-router.get('/tags', getPopularTags);
 
 module.exports = router;

@@ -70,9 +70,41 @@ UserSchema.methods.matchPassword = async function(enteredPassword) {
 
 // JWT token oluşturma metodu
 UserSchema.methods.getSignedJwtToken = function() {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE || '7d'
+  const expiresIn = process.env.JWT_EXPIRE || '7d';
+  const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: expiresIn
   });
+  
+  // Token süresini hesapla
+  const expiresAt = new Date();
+  if (expiresIn.endsWith('d')) {
+    expiresAt.setDate(expiresAt.getDate() + parseInt(expiresIn));
+  } else if (expiresIn.endsWith('h')) {
+    expiresAt.setHours(expiresAt.getHours() + parseInt(expiresIn));
+  } else if (expiresIn.endsWith('m')) {
+    expiresAt.setMinutes(expiresAt.getMinutes() + parseInt(expiresIn));
+  }
+  
+  return {
+    token,
+    expiresAt,
+    expiresIn
+  };
+};
+
+// Refresh token oluşturma metodu
+UserSchema.methods.getRefreshToken = function() {
+  const refreshToken = jwt.sign({ id: this._id, type: 'refresh' }, process.env.JWT_SECRET, {
+    expiresIn: '30d'
+  });
+  
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 30);
+  
+  return {
+    refreshToken,
+    expiresAt
+  };
 };
 
 module.exports = mongoose.model('User', UserSchema);

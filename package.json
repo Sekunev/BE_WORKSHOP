@@ -17,7 +17,8 @@
     "users:make-admin": "node src/utils/userCLI.js make-admin",
     "users:make-user": "node src/utils/userCLI.js make-user",
     "users:toggle": "node src/utils/userCLI.js toggle",
-    "users:delete": "node src/utils/userCLI.js delete"
+    "users:delete": "node src/utils/userCLI.js delete",
+    "seed": "node src/utils/seedData.js"
   },
   "keywords": ["blog", "api", "nodejs", "express", "mongodb"],
   "author": "Abdullah",

@@ -68,7 +68,8 @@ const BlogSchema = new mongoose.Schema({
   },
   slug: {
     type: String,
-    unique: true
+    unique: true,
+    sparse: true // null değerlere izin ver
   }
 }, {
   timestamps: true
@@ -77,16 +78,38 @@ const BlogSchema = new mongoose.Schema({
 // Slug oluşturma (kaydetmeden önce)
 BlogSchema.pre('save', function(next) {
   if (this.isModified('title') || this.isNew) {
-    this.slug = this.title
+    // Türkçe karakterleri dönüştür
+    const turkishChars = {
+      'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u',
+      'Ç': 'C', 'Ğ': 'G', 'İ': 'I', 'Ö': 'O', 'Ş': 'S', 'Ü': 'U'
+    };
+    
+    let slug = this.title;
+    
+    // Türkçe karakterleri değiştir
+    for (const [turkish, english] of Object.entries(turkishChars)) {
+      slug = slug.replace(new RegExp(turkish, 'g'), english);
+    }
+    
+    // Slug oluştur
+    this.slug = slug
       .toLowerCase()
-      .replace(/[^a-zA-Z0-9]/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
+      .replace(/[^a-zA-Z0-9\s]/g, '') // Özel karakterleri kaldır
+      .replace(/\s+/g, '-') // Boşlukları tire ile değiştir
+      .replace(/-+/g, '-') // Çoklu tireleri tek tire yap
+      .replace(/^-|-$/g, ''); // Başta ve sonda tire varsa kaldır
+    
+    // Eğer slug boşsa, ID kullan
+    if (!this.slug) {
+      this.slug = this._id ? this._id.toString() : 'blog-' + Date.now();
+    }
   }
   
   // Okuma süresini hesapla (ortalama 200 kelime/dakika)
-  const wordCount = this.content.split(' ').length;
-  this.readingTime = Math.ceil(wordCount / 200);
+  if (this.content) {
+    const wordCount = this.content.split(' ').length;
+    this.readingTime = Math.ceil(wordCount / 200);
+  }
   
   next();
 });
