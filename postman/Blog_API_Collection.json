@@ -47,7 +47,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"123456\"\n}"
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"123456\",\n  \"confirmPassword\": \"123456\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
@@ -278,7 +278,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Abdullah AHLATLI Updated\",\n  \"bio\": \"Yazılım geliştirici ve sistem yöneticisi\"\n}"
+              "raw": "{\n  \"name\": \"Abdullah AHLATLI Updated\",\n  \"bio\": \"Yazılım geliştirici ve sistem yöneticisi\",\n  \"avatar\": \"https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/users/profile",
@@ -286,6 +286,32 @@
               "path": ["users", "profile"]
             },
             "description": "Profil güncelle"
+          }
+        },
+        {
+          "name": "Update Avatar Only",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Abdullah AHLATLI\",\n  \"bio\": \"Yazılım geliştirici ve sistem yöneticisi\",\n  \"avatar\": \"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "profile"]
+            },
+            "description": "Sadece avatar güncelle (profil endpoint'i kullanarak)"
           }
         },
         {
