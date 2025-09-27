@@ -69,11 +69,11 @@ const getUser = async (req, res, next) => {
 // @access  Private
 const updateProfile = async (req, res, next) => {
   try {
-    const { name, bio } = req.body;
+    const { name, bio, avatar } = req.body;
 
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { name, bio },
+      { name, bio, avatar },
       {
         new: true,
         runValidators: true
@@ -164,10 +164,31 @@ const getUserBlogs = async (req, res, next) => {
   }
 };
 
+const updateAvatar = async (req, res, next) => {
+  try {
+    const { avatarUrl } = req.body;
+    
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { avatar: avatarUrl },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Avatar başarıyla güncellendi',
+      data: { user }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getUsers,
   getUser,
   updateProfile,
   deleteUser,
-  getUserBlogs
+  getUserBlogs,
+  updateAvatar
 };

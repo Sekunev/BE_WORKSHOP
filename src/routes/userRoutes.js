@@ -85,6 +85,9 @@ router.get('/:id', protect, getUser);
  *               bio:
  *                 type: string
  *                 example: "Yazılım geliştirici"
+ *               avatar:
+ *                 type: string
+ *                 example: "https://example.com/avatar.jpg"
  *     responses:
  *       200:
  *         description: Profil başarıyla güncellendi
@@ -99,7 +102,12 @@ router.put('/profile', protect, [
     .optional()
     .trim()
     .isLength({ max: 500 })
-    .withMessage('Bio 500 karakterden fazla olamaz')
+    .withMessage('Bio 500 karakterden fazla olamaz'),
+  body('avatar')
+    .optional()
+    .trim()
+    .isURL()
+    .withMessage('Geçerli bir URL giriniz')
 ], handleValidationErrors, updateProfile);
 
 /**
