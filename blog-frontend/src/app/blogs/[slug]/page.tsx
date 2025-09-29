@@ -14,7 +14,6 @@ import {
   Clock, 
   Eye, 
   Heart, 
-  User, 
   ArrowLeft,
   Edit,
   Trash2,
@@ -32,24 +31,26 @@ export default function BlogDetailPage() {
 
   const slug = params.slug as string;
 
-  useEffect(() => {
-    if (slug && slug !== 'undefined') {
-      loadBlog();
-    }
-  }, [slug]);
+
 
   const loadBlog = async () => {
     try {
       setIsLoading(true);
       const blogData = await blogService.getBlogBySlug(slug);
       setBlog(blogData);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error('Blog yüklenirken bir hata oluştu');
       console.error('Blog loading error:', error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (slug && slug !== 'undefined') {
+      loadBlog();
+    }
+  }, [slug, loadBlog]);
 
   const handleLike = async () => {
     if (!isAuthenticated) {
@@ -62,7 +63,7 @@ export default function BlogDetailPage() {
       const response = await blogService.likeBlog(blog!._id);
       setBlog(prev => prev ? { ...prev, likeCount: response.likeCount } : null);
       toast.success('Blog beğenildi!');
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error('Blog beğenilirken bir hata oluştu');
     } finally {
       setIsLiking(false);

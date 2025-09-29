@@ -18,9 +18,7 @@ export default function BlogList() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  useEffect(() => {
-    loadBlogs();
-  }, [loadBlogs]);
+
 
   const loadBlogs = useCallback(async () => {
     try {
@@ -35,6 +33,9 @@ export default function BlogList() {
       setIsLoading(false);
     }
   }, [page]);
+  useEffect(() => {
+    loadBlogs();
+  }, [loadBlogs]);
 
   const loadMore = async () => {
     try {

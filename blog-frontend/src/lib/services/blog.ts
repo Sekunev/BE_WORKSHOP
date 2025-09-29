@@ -46,6 +46,7 @@ export interface BlogListResponse {
   pages: number;
   data: {
     blogs: Blog[];
+    pages: number;
   };
 }
 

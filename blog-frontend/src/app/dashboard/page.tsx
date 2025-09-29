@@ -7,7 +7,6 @@ import Navigation from '@/components/layout/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { blogService, Blog } from '@/lib/services/blog';
 import { toast } from 'sonner';
@@ -19,8 +18,6 @@ import {
   Heart, 
   Calendar,
   FileText,
-  TrendingUp,
-  Users
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
@@ -56,11 +53,11 @@ export default function DashboardPage() {
       const totalLikes = response.data.blogs.reduce((sum, blog) => sum + blog.likeCount, 0);
       
       setStats({
-        totalBlogs: response.data.total,
+        totalBlogs: response.data.blogs.length,
         totalViews,
         totalLikes,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error('Bloglar yüklenirken bir hata oluştu');
       console.error('Blog loading error:', error);
     } finally {
@@ -78,7 +75,7 @@ export default function DashboardPage() {
       setBlogs(prev => prev.filter(blog => blog._id !== blogId));
       setStats(prev => ({ ...prev, totalBlogs: prev.totalBlogs - 1 }));
       toast.success('Blog başarıyla silindi');
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error('Blog silinirken bir hata oluştu');
     }
   };
