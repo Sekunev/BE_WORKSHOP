@@ -23,7 +23,7 @@ const editBlogSchema = z.object({
   excerpt: z.string().optional(),
   category: z.string().min(1, 'Kategori seçmelisiniz'),
   tags: z.string().optional(),
-  isPublished: z.boolean().default(false),
+  isPublished: z.boolean(),
 });
 
 type EditBlogFormData = z.infer<typeof editBlogSchema>;
@@ -95,7 +95,7 @@ export default function EditBlogForm({ blogId }: EditBlogFormProps) {
       
       setTags(foundBlog.tags || []);
       setValue('tags', (foundBlog.tags || []).join(','));
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error('Blog yüklenirken bir hata oluştu');
       console.error('Blog loading error:', error);
       router.push('/dashboard');
@@ -152,8 +152,8 @@ export default function EditBlogForm({ blogId }: EditBlogFormProps) {
       await blogService.updateBlog(blogData);
       toast.success('Blog başarıyla güncellendi!');
       router.push(`/blogs/${blog.slug}`);
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Blog güncellenirken bir hata oluştu';
+    } catch (error: unknown) {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Blog güncellenirken bir hata oluştu';
       toast.error(message);
     } finally {
       setIsSaving(false);

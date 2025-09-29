@@ -52,8 +52,8 @@ export default function ChangePasswordForm() {
       
       toast.success('Şifre başarıyla değiştirildi!');
       reset();
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Şifre değiştirilirken bir hata oluştu';
+    } catch (error: unknown) {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Şifre değiştirilirken bir hata oluştu';
       toast.error(message);
     } finally {
       setIsLoading(false);

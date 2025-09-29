@@ -11,8 +11,7 @@ import {
   Heart, 
   MessageCircle,
   TrendingUp,
-  Calendar,
-  Clock
+  Calendar
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
@@ -22,7 +21,7 @@ interface BlogStats {
   totalViews: number;
   totalLikes: number;
   totalComments: number;
-  recentBlogs: any[];
+  recentBlogs: unknown[];
 }
 
 export default function BlogStats() {
@@ -45,18 +44,18 @@ export default function BlogStats() {
       const response = await blogService.getMyBlogs(1, 10);
       
       const blogs = response.data.blogs;
-      const totalViews = blogs.reduce((sum: number, blog: any) => sum + blog.viewCount, 0);
-      const totalLikes = blogs.reduce((sum: number, blog: any) => sum + blog.likeCount, 0);
-      const totalComments = blogs.reduce((sum: number, blog: any) => sum + blog.commentCount, 0);
+      const totalViews = blogs.reduce((sum: number, blog: unknown) => sum + (blog as { viewCount: number }).viewCount, 0);
+      const totalLikes = blogs.reduce((sum: number, blog: unknown) => sum + (blog as { likeCount: number }).likeCount, 0);
+      const totalComments = blogs.reduce((sum: number, blog: unknown) => sum + (blog as { commentCount: number }).commentCount, 0);
 
       setStats({
-        totalBlogs: response.data.total,
+        totalBlogs: response.data.blogs.length,
         totalViews,
         totalLikes,
         totalComments,
         recentBlogs: blogs.slice(0, 5),
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error('Blog istatistikleri yüklenirken bir hata oluştu');
       console.error('Blog stats error:', error);
     } finally {

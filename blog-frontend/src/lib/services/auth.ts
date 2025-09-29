@@ -78,7 +78,7 @@ export const authService = {
   },
 
   // Debug token
-  debugToken: async (): Promise<any> => {
+  debugToken: async (): Promise<unknown> => {
     const response = await api.get('/auth/debug');
     return response.data.data;
   },
