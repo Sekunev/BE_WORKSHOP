@@ -189,7 +189,7 @@ export default function ProfileForm() {
 
             <div className="space-y-2">
               <Label htmlFor="avatar" className="flex items-center space-x-2">
-                <Image className="h-4 w-4" />
+                <Image className="h-4 w-4" alt="Avatar icon" />
                 <span>Avatar URL</span>
               </Label>
               <Input

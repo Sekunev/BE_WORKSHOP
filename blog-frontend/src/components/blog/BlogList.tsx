@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { blogService, Blog } from '@/lib/services/blog';
 import { toast } from 'sonner';
-import { Calendar, Clock, Eye, Heart, User } from 'lucide-react';
+import { Calendar, Clock, Eye, Heart } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 
@@ -20,21 +20,21 @@ export default function BlogList() {
 
   useEffect(() => {
     loadBlogs();
-  }, []);
+  }, [loadBlogs]);
 
-  const loadBlogs = async () => {
+  const loadBlogs = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await blogService.getBlogs(page, 6);
       setBlogs(response.data.blogs);
       setHasMore(response.data.pages > page);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error('Bloglar yüklenirken bir hata oluştu');
       console.error('Blog loading error:', error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [page]);
 
   const loadMore = async () => {
     try {
@@ -43,7 +43,7 @@ export default function BlogList() {
       setBlogs(prev => [...prev, ...response.data.blogs]);
       setPage(nextPage);
       setHasMore(response.data.pages > nextPage);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error('Daha fazla blog yüklenirken bir hata oluştu');
     }
   };

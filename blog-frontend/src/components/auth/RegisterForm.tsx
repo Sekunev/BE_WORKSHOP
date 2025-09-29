@@ -46,8 +46,8 @@ export default function RegisterForm() {
       await registerUser(data.name, data.email, data.password, data.confirmPassword);
       toast.success('Kayıt başarılı!');
       router.push('/dashboard');
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Kayıt olurken bir hata oluştu';
+    } catch (error: unknown) {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Kayıt olurken bir hata oluştu';
       toast.error(message);
     } finally {
       setIsLoading(false);

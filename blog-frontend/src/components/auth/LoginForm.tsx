@@ -40,8 +40,8 @@ export default function LoginForm() {
       await login(data.email, data.password);
       toast.success('Giriş başarılı!');
       router.push('/dashboard');
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Giriş yapılırken bir hata oluştu';
+    } catch (error: unknown) {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Giriş yapılırken bir hata oluştu';
       toast.error(message);
     } finally {
       setIsLoading(false);
