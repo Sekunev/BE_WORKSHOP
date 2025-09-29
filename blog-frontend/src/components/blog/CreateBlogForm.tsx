@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,7 @@ const createBlogSchema = z.object({
   excerpt: z.string().optional(),
   category: z.string().min(1, 'Kategori seçmelisiniz'),
   tags: z.string().optional(),
-  isPublished: z.boolean().default(false),
+  isPublished: z.boolean(),
 });
 
 type CreateBlogFormData = z.infer<typeof createBlogSchema>;
@@ -57,6 +57,7 @@ export default function CreateBlogForm() {
     defaultValues: {
       isPublished: false,
     },
+    mode: 'onChange',
   });
 
   const watchedContent = watch('content');
@@ -83,14 +84,14 @@ export default function CreateBlogForm() {
     setValue('tags', newTags.join(','));
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       addTag();
     }
   };
 
-  const onSubmit = async (data: CreateBlogFormData) => {
+  const onSubmit: SubmitHandler<CreateBlogFormData> = async (data: CreateBlogFormData) => {
     if (!isAuthenticated) {
       toast.error('Blog oluşturmak için giriş yapmalısınız');
       return;
@@ -110,8 +111,8 @@ export default function CreateBlogForm() {
       const blog = await blogService.createBlog(blogData);
       toast.success('Blog başarıyla oluşturuldu!');
       router.push(`/blogs/${blog.slug}`);
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Blog oluşturulurken bir hata oluştu';
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Blog oluşturulurken bir hata oluştu';
       toast.error(message);
     } finally {
       setIsLoading(false);
