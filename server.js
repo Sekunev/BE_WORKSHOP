@@ -30,6 +30,7 @@ app.use(helmet());
 const corsOptions = {
   origin: [
     'https://abdullahahlatliblogapp.up.railway.app',
+    'https://splendid-curiosity-production.up.railway.app',
     'http://localhost:3000',
     'http://localhost:3001'
   ],
