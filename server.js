@@ -23,31 +23,35 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Security middleware
-app.use(helmet());
-
-// CORS yapılandırması
-const corsOptions = {
-  origin: [
-    'https://abdullahahlatliblogapp.up.railway.app',
-    'https://splendid-curiosity-production.up.railway.app',
-    'http://localhost:3000',
-    'http://localhost:3001'
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: [
-    'Content-Type', 
-    'Authorization', 
-    'Accept', 
-    'Origin', 
-    'X-Requested-With',
-    'X-HTTP-Method-Override'
-  ],
+// CORS ayarları - Helmet'ten önce
+app.use(cors({
+  origin: true, // Tüm origin'lere izin ver
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
   optionsSuccessStatus: 200
-};
+}));
 
-app.use(cors(corsOptions));
+// Security middleware - CORS'tan sonra
+app.use(helmet({
+  crossOriginEmbedderPolicy: false,
+  contentSecurityPolicy: false
+}));
+
+// Manuel CORS header'ları
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Origin, X-Requested-With');
+  
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    return;
+  }
+  
+  next();
+});
 
 // Rate limiting
 const limiter = rateLimit({
