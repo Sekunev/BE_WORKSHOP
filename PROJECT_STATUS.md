@@ -1,12 +1,12 @@
 # 📊 Proje Durumu Raporu
 
-> Son güncelleme: 24.09.2025 22:05:57
+> Son güncelleme: 08.10.2025 21:02:01
 
 ## 📈 Genel İstatistikler
 
 | Metrik | Değer |
 |--------|-------|
-| **Toplam Endpoint** | 18 |
+| **Toplam Endpoint** | 20 |
 | **Toplam Model** | 3 |
 | **Toplam Middleware** | 3 |
 
@@ -15,8 +15,8 @@
 ### HTTP Method'lara Göre
 | Method | Sayı |
 |--------|------|
-| GET | 9 |
-| POST | 4 |
+| GET | 10 |
+| POST | 5 |
 | PUT | 3 |
 | DELETE | 2 |
 | PATCH | 0 |
@@ -25,14 +25,14 @@
 ### Erişim Yetkisine Göre
 | Erişim | Sayı |
 |--------|------|
-| 🔒 Private | 4 |
+| 🔒 Private | 6 |
 | 👑 Private/Admin | 14 |
 
 
 ### Route'lara Göre
 | Route | Endpoint Sayısı |
 |-------|-----------------|
-| /api/auth | 4 |
+| /api/auth | 6 |
 | /api/blog | 9 |
 | /api/user | 5 |
 
@@ -43,17 +43,19 @@
 |--------|----------|----------|--------|-------|
 | ➕ POST | `/register` | POST /register | 🔒 Private | auth |
 | ➕ POST | `/login` | POST /login | 🔒 Private | auth |
+| 🔍 GET | `/debug` | GET /debug | 🔒 Private | auth |
 | 🔍 GET | `/me` | GET /me | 🔒 Private | auth |
 | ✏️ PUT | `/change-password` | PUT /change-password | 🔒 Private | auth |
+| ➕ POST | `/refresh` | POST /refresh | 🔒 Private | auth |
 | 🔍 GET | `/` | GET / | 👑 Private/Admin | blog |
+| 🔍 GET | `/categories` | GET /categories | 👑 Private/Admin | blog |
+| 🔍 GET | `/tags` | GET /tags | 👑 Private/Admin | blog |
+| 🔍 GET | `/my-blogs` | GET /my-blogs | 👑 Private/Admin | blog |
 | 🔍 GET | `/:slug` | GET /:slug | 👑 Private/Admin | blog |
 | ➕ POST | `/` | POST / | 👑 Private/Admin | blog |
 | ✏️ PUT | `/:id` | PUT /:id | 👑 Private/Admin | blog |
 | 🗑️ DELETE | `/:id` | DELETE /:id | 👑 Private/Admin | blog |
-| 🔍 GET | `/my-blogs` | GET /my-blogs | 👑 Private/Admin | blog |
 | ➕ POST | `/:id/like` | POST /:id/like | 👑 Private/Admin | blog |
-| 🔍 GET | `/categories` | GET /categories | 👑 Private/Admin | blog |
-| 🔍 GET | `/tags` | GET /tags | 👑 Private/Admin | blog |
 | 🔍 GET | `/` | GET / | 👑 Private/Admin | user |
 | 🔍 GET | `/:id` | GET /:id | 👑 Private/Admin | user |
 | ✏️ PUT | `/profile` | PUT /profile | 👑 Private/Admin | user |
@@ -101,6 +103,11 @@ Bu dokümantasyon otomatik olarak oluşturulmuştur. Yeni endpoint eklediğinizd
 - **Erişim**: 🔒 Private
 - **Etiketler**: auth
 
+**🔍 GET /debug**
+- **Açıklama**: GET /debug
+- **Erişim**: 🔒 Private
+- **Etiketler**: auth
+
 **🔍 GET /me**
 - **Açıklama**: GET /me
 - **Erişim**: 🔒 Private
@@ -111,10 +118,30 @@ Bu dokümantasyon otomatik olarak oluşturulmuştur. Yeni endpoint eklediğinizd
 - **Erişim**: 🔒 Private
 - **Etiketler**: auth
 
+**➕ POST /refresh**
+- **Açıklama**: POST /refresh
+- **Erişim**: 🔒 Private
+- **Etiketler**: auth
+
 ### BLOG Routes
 
 **🔍 GET /**
 - **Açıklama**: GET /
+- **Erişim**: 👑 Private/Admin
+- **Etiketler**: blog
+
+**🔍 GET /categories**
+- **Açıklama**: GET /categories
+- **Erişim**: 👑 Private/Admin
+- **Etiketler**: blog
+
+**🔍 GET /tags**
+- **Açıklama**: GET /tags
+- **Erişim**: 👑 Private/Admin
+- **Etiketler**: blog
+
+**🔍 GET /my-blogs**
+- **Açıklama**: GET /my-blogs
 - **Erişim**: 👑 Private/Admin
 - **Etiketler**: blog
 
@@ -138,23 +165,8 @@ Bu dokümantasyon otomatik olarak oluşturulmuştur. Yeni endpoint eklediğinizd
 - **Erişim**: 👑 Private/Admin
 - **Etiketler**: blog
 
-**🔍 GET /my-blogs**
-- **Açıklama**: GET /my-blogs
-- **Erişim**: 👑 Private/Admin
-- **Etiketler**: blog
-
 **➕ POST /:id/like**
 - **Açıklama**: POST /:id/like
-- **Erişim**: 👑 Private/Admin
-- **Etiketler**: blog
-
-**🔍 GET /categories**
-- **Açıklama**: GET /categories
-- **Erişim**: 👑 Private/Admin
-- **Etiketler**: blog
-
-**🔍 GET /tags**
-- **Açıklama**: GET /tags
 - **Erişim**: 👑 Private/Admin
 - **Etiketler**: blog
 
@@ -189,4 +201,4 @@ Bu dokümantasyon otomatik olarak oluşturulmuştur. Yeni endpoint eklediğinizd
 
 ---
 
-*Bu rapor 24.09.2025 22:05:57 tarihinde otomatik oluşturulmuştur.*
+*Bu rapor 08.10.2025 21:02:01 tarihinde otomatik oluşturulmuştur.*

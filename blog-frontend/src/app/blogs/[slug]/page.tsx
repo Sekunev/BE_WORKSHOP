@@ -17,10 +17,13 @@ import {
   ArrowLeft,
   Edit,
   Trash2,
-  Share2
+  Share2,
+  Sparkles,
+  Bot
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import { MarkdownContent } from '@/components/blog/MarkdownContent';
 
 export default function BlogDetailPage() {
   const [blog, setBlog] = useState<Blog | null>(null);
@@ -158,7 +161,15 @@ export default function BlogDetailPage() {
               <span className="text-sm text-gray-600">{blog.author.name}</span>
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{blog.title}</h1>
+            <div className="flex items-start gap-3 mb-4">
+              <h1 className="text-3xl font-bold text-gray-900 flex-1">{blog.title}</h1>
+              {blog.aiGenerated && (
+                <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                  <Sparkles className="h-4 w-4 mr-1" />
+                  AI ile Oluşturuldu
+                </Badge>
+              )}
+            </div>
             
             <p className="text-lg text-gray-600 mb-6">{blog.excerpt}</p>
 
@@ -230,10 +241,42 @@ export default function BlogDetailPage() {
 
           {/* Content */}
           <div className="p-8">
-            <div 
+            <MarkdownContent 
+              content={blog.content}
               className="prose prose-lg max-w-none"
-              dangerouslySetInnerHTML={{ __html: blog.content.replace(/\n/g, '<br />') }}
             />
+            
+            {/* AI Metadata */}
+            {blog.aiGenerated && blog.aiMetadata && (
+              <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg">
+                <div className="flex items-center gap-2 mb-3">
+                  <Bot className="h-4 w-4 text-purple-600" />
+                  <h3 className="text-base font-semibold text-purple-900">AI Blog Detayları</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                  <div className="flex">
+                    <span className="font-medium text-gray-700 min-w-[80px]">Konu:</span>
+                    <span className="text-gray-600 truncate">{blog.aiMetadata.konu}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="font-medium text-gray-700 min-w-[80px]">Tarz:</span>
+                    <span className="text-gray-600 truncate">{blog.aiMetadata.tarz}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="font-medium text-gray-700 min-w-[80px]">Kelime:</span>
+                    <span className="text-gray-600">{blog.aiMetadata.kelimeSayisi}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="font-medium text-gray-700 min-w-[80px]">Hedef:</span>
+                    <span className="text-gray-600 truncate">{blog.aiMetadata.hedefKitle}</span>
+                  </div>
+                  <div className="md:col-span-2 flex">
+                    <span className="font-medium text-gray-700 min-w-[80px]">Model:</span>
+                    <span className="text-gray-600 text-xs font-mono">{blog.aiMetadata.model}</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

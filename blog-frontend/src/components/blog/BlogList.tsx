@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { blogService, Blog } from '@/lib/services/blog';
 import { toast } from 'sonner';
-import { Calendar, Clock, Eye, Heart } from 'lucide-react';
+import { Calendar, Clock, Eye, Heart, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 
@@ -94,17 +94,25 @@ export default function BlogList() {
                 <span className="text-sm text-gray-600">{blog.author.name}</span>
               </div>
               
-              <CardTitle className="line-clamp-2">
-                <Link 
-                  href={`/blogs/${blog.slug}`}
-                  className="hover:text-blue-600 transition-colors"
-                >
-                  {blog.title}
-                </Link>
-              </CardTitle>
+              <div className="flex items-start gap-2">
+                <CardTitle className="line-clamp-2 flex-1">
+                  <Link 
+                    href={`/blogs/${blog.slug}`}
+                    className="hover:text-blue-600 transition-colors"
+                  >
+                    {blog.title}
+                  </Link>
+                </CardTitle>
+                {blog.aiGenerated && (
+                  <Badge variant="default" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white flex-shrink-0">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    AI
+                  </Badge>
+                )}
+              </div>
               
-              <CardDescription className="line-clamp-3">
-                {blog.excerpt}
+              <CardDescription className="line-clamp-3 text-sm text-gray-600">
+                {blog.excerpt || 'Blog özeti mevcut değil...'}
               </CardDescription>
             </CardHeader>
             

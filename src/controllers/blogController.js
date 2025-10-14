@@ -1,5 +1,6 @@
 const Blog = require('../models/Blog');
 const Comment = require('../models/Comment');
+const { generateBlogContent, generateRandomBlog, getRemainingTopics, blogKonulari } = require('../services/groqService');
 
 // @desc    Tüm blogları getir
 // @route   GET /api/blogs
@@ -293,6 +294,167 @@ const getPopularTags = async (req, res, next) => {
   }
 };
 
+// @desc    AI ile blog oluştur
+// @route   POST /api/blogs/ai/generate
+// @access  Private/Admin
+const generateAIBlog = async (req, res, next) => {
+  try {
+    // Sadece admin kullanıcılar AI blog oluşturabilir
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        status: 'error',
+        message: 'Bu işlem için yetkiniz bulunmuyor'
+      });
+    }
+
+    const { konu, tarz, kelimeSayisi, hedefKitle, autoPublish } = req.body;
+
+    // AI ile blog içeriği oluştur
+    const aiContent = await generateBlogContent(konu, {
+      tarz,
+      kelimeSayisi,
+      hedefKitle
+    });
+
+    // Blog oluştur
+    const blogData = {
+      title: aiContent.title,
+      content: aiContent.content,
+      excerpt: aiContent.excerpt,
+      category: aiContent.category || 'Teknoloji',
+      tags: aiContent.tags || [],
+      author: req.user.id,
+      isPublished: autoPublish === true,
+      publishedAt: autoPublish === true ? new Date() : null,
+      aiGenerated: true,
+      aiMetadata: aiContent.metadata
+    };
+
+    const blog = await Blog.create(blogData);
+    await blog.populate('author', 'name avatar');
+
+    res.status(201).json({
+      status: 'success',
+      message: 'AI blog başarıyla oluşturuldu',
+      data: {
+        blog
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Rastgele AI blog oluştur
+// @route   POST /api/blogs/ai/generate-random
+// @access  Private/Admin
+const generateRandomAIBlog = async (req, res, next) => {
+  try {
+    // Sadece admin kullanıcılar AI blog oluşturabilir
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        status: 'error',
+        message: 'Bu işlem için yetkiniz bulunmuyor'
+      });
+    }
+
+    const { autoPublish } = req.body;
+
+    // Rastgele AI blog oluştur
+    const aiContent = await generateRandomBlog();
+
+    // Blog oluştur
+    const blogData = {
+      title: aiContent.title,
+      content: aiContent.content,
+      excerpt: aiContent.excerpt,
+      category: aiContent.category || 'Teknoloji',
+      tags: aiContent.tags || [],
+      author: req.user.id,
+      isPublished: autoPublish === true,
+      publishedAt: autoPublish === true ? new Date() : null,
+      aiGenerated: true,
+      aiMetadata: aiContent.metadata
+    };
+
+    const blog = await Blog.create(blogData);
+    await blog.populate('author', 'name avatar');
+
+    res.status(201).json({
+      status: 'success',
+      message: 'Rastgele AI blog başarıyla oluşturuldu',
+      data: {
+        blog
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Mevcut blog konularını getir
+// @route   GET /api/blogs/ai/topics
+// @access  Private/Admin
+const getAITopics = async (req, res, next) => {
+  try {
+    // Kullanılmış konuları bul
+    const usedBlogs = await Blog.find({ aiGenerated: true }).select('aiMetadata.konu');
+    const usedTopics = usedBlogs
+      .filter(blog => blog.aiMetadata?.konu)
+      .map(blog => blog.aiMetadata.konu);
+
+    const remainingTopics = getRemainingTopics(usedTopics);
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        allTopics: blogKonulari,
+        usedTopics,
+        remainingTopics,
+        totalTopics: blogKonulari.length,
+        usedCount: usedTopics.length,
+        remainingCount: remainingTopics.length
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    AI bloglarını getir
+// @route   GET /api/blogs/ai/blogs
+// @access  Private/Admin
+const getAIBlogs = async (req, res, next) => {
+  try {
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const startIndex = (page - 1) * limit;
+
+    const query = { aiGenerated: true };
+
+    const total = await Blog.countDocuments(query);
+
+    const blogs = await Blog.find(query)
+      .populate('author', 'name avatar')
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip(startIndex);
+
+    res.status(200).json({
+      status: 'success',
+      count: blogs.length,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      data: {
+        blogs
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getBlogs,
   getBlog,
@@ -302,5 +464,9 @@ module.exports = {
   getMyBlogs,
   likeBlog,
   getCategories,
-  getPopularTags
+  getPopularTags,
+  generateAIBlog,
+  generateRandomAIBlog,
+  getAITopics,
+  getAIBlogs
 };

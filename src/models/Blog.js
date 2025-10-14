@@ -70,13 +70,25 @@ const BlogSchema = new mongoose.Schema({
     type: String,
     unique: true,
     sparse: true // null değerlere izin ver
+  },
+  aiGenerated: {
+    type: Boolean,
+    default: false
+  },
+  aiMetadata: {
+    konu: String,
+    tarz: String,
+    kelimeSayisi: Number,
+    hedefKitle: String,
+    model: String,
+    generatedAt: Date
   }
 }, {
   timestamps: true
 });
 
 // Slug oluşturma (kaydetmeden önce)
-BlogSchema.pre('save', function(next) {
+BlogSchema.pre('save', async function(next) {
   if (this.isModified('title') || this.isNew) {
     // Türkçe karakterleri dönüştür
     const turkishChars = {
@@ -92,7 +104,7 @@ BlogSchema.pre('save', function(next) {
     }
     
     // Slug oluştur
-    this.slug = slug
+    let baseSlug = slug
       .toLowerCase()
       .replace(/[^a-zA-Z0-9\s]/g, '') // Özel karakterleri kaldır
       .replace(/\s+/g, '-') // Boşlukları tire ile değiştir
@@ -100,9 +112,35 @@ BlogSchema.pre('save', function(next) {
       .replace(/^-|-$/g, ''); // Başta ve sonda tire varsa kaldır
     
     // Eğer slug boşsa, ID kullan
-    if (!this.slug) {
-      this.slug = this._id ? this._id.toString() : 'blog-' + Date.now();
+    if (!baseSlug) {
+      baseSlug = this._id ? this._id.toString() : 'blog-' + Date.now();
     }
+    
+    // Duplicate slug kontrolü ve unique slug oluşturma
+    let uniqueSlug = baseSlug;
+    let counter = 1;
+    
+    while (true) {
+      const existingBlog = await this.constructor.findOne({ 
+        slug: uniqueSlug,
+        _id: { $ne: this._id } // Kendi ID'sini hariç tut (update durumu için)
+      });
+      
+      if (!existingBlog) {
+        break; // Unique slug bulundu
+      }
+      
+      // AI generated blog için timestamp ekle, diğerleri için sayı
+      if (this.aiGenerated) {
+        uniqueSlug = `${baseSlug}-${Date.now()}`;
+        break; // Timestamp her zaman unique
+      } else {
+        uniqueSlug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+    }
+    
+    this.slug = uniqueSlug;
   }
   
   // Okuma süresini hesapla (ortalama 200 kelime/dakika)

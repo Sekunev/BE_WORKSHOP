@@ -9,7 +9,11 @@ const {
   getMyBlogs,
   likeBlog,
   getCategories,
-  getPopularTags
+  getPopularTags,
+  generateAIBlog,
+  generateRandomAIBlog,
+  getAITopics,
+  getAIBlogs
 } = require('../controllers/blogController');
 const { protect, authorize } = require('../middleware/auth');
 const handleValidationErrors = require('../middleware/validation');
@@ -82,25 +86,6 @@ router.get('/tags', getPopularTags);
 
 /**
  * @swagger
- * /api/blogs/{slug}:
- *   get:
- *     summary: Tek blog getir
- *     tags: [Blogs]
- *     parameters:
- *       - in: path
- *         name: slug
- *         required: true
- *         schema:
- *           type: string
- *         description: Blog slug
- *     responses:
- *       200:
- *         description: Blog başarıyla getirildi
- *       404:
- *         description: Blog bulunamadı
- */
-/**
- * @swagger
  * /api/blogs/my-blogs:
  *   get:
  *     summary: Kullanıcının kendi bloglarını getir
@@ -125,6 +110,112 @@ router.get('/tags', getPopularTags);
  *         description: Bloglar başarıyla getirildi
  */
 router.get('/my-blogs', protect, getMyBlogs);
+
+/**
+ * @swagger
+ * /api/blogs/ai/generate:
+ *   post:
+ *     summary: AI ile blog oluştur
+ *     tags: [AI Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               konu:
+ *                 type: string
+ *                 example: "Yapay Zeka İş Dünyasını Nasıl Dönüştürüyor?"
+ *               tarz:
+ *                 type: string
+ *                 enum: ["profesyonel", "samimi", "akademik", "eğitici"]
+ *                 example: "profesyonel"
+ *               kelimeSayisi:
+ *                 type: integer
+ *                 enum: [800, 1200, 1500]
+ *                 example: 1200
+ *               hedefKitle:
+ *                 type: string
+ *                 enum: ["yeni başlayanlar", "profesyoneller", "öğrenciler"]
+ *                 example: "profesyoneller"
+ *               autoPublish:
+ *                 type: boolean
+ *                 example: false
+ *     responses:
+ *       201:
+ *         description: AI blog başarıyla oluşturuldu
+ *       403:
+ *         description: Yetkiniz bulunmuyor
+ */
+router.post('/ai/generate', protect, authorize('admin'), generateAIBlog);
+
+/**
+ * @swagger
+ * /api/blogs/ai/generate-random:
+ *   post:
+ *     summary: Rastgele AI blog oluştur
+ *     tags: [AI Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               autoPublish:
+ *                 type: boolean
+ *                 example: true
+ *     responses:
+ *       201:
+ *         description: Rastgele AI blog başarıyla oluşturuldu
+ *       403:
+ *         description: Yetkiniz bulunmuyor
+ */
+router.post('/ai/generate-random', protect, authorize('admin'), generateRandomAIBlog);
+
+/**
+ * @swagger
+ * /api/blogs/ai/topics:
+ *   get:
+ *     summary: Mevcut blog konularını getir
+ *     tags: [AI Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Konular başarıyla getirildi
+ */
+router.get('/ai/topics', protect, authorize('admin'), getAITopics);
+
+/**
+ * @swagger
+ * /api/blogs/ai/blogs:
+ *   get:
+ *     summary: AI ile oluşturulan blogları getir
+ *     tags: [AI Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *     responses:
+ *       200:
+ *         description: AI bloglar başarıyla getirildi
+ */
+router.get('/ai/blogs', protect, authorize('admin'), getAIBlogs);
 
 /**
  * @swagger

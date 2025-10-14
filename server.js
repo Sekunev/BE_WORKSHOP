@@ -18,6 +18,9 @@ const errorHandler = require('./src/middleware/errorHandler');
 // Import config
 const connectDB = require('./src/config/database');
 
+// Import scheduler
+const blogScheduler = require('./src/utils/blogScheduler');
+
 const app = express();
 
 // Connect to MongoDB
@@ -117,4 +120,11 @@ app.listen(PORT, () => {
   console.log(`🚀 Server ${PORT} portunda çalışıyor`);
   console.log(`📚 API Dokümantasyonu: http://localhost:${PORT}/api-docs`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  
+  // Blog scheduler'ı başlat
+  if (process.env.ENABLE_AUTO_SCHEDULER === 'true') {
+    blogScheduler.start();
+  } else {
+    console.log('⏸️  Blog scheduler devre dışı');
+  }
 });

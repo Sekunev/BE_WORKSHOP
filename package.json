@@ -18,7 +18,9 @@
     "users:make-user": "node src/utils/userCLI.js make-user",
     "users:toggle": "node src/utils/userCLI.js toggle",
     "users:delete": "node src/utils/userCLI.js delete",
-    "seed": "node src/utils/seedData.js"
+    "seed": "node src/utils/seedData.js",
+    "test:ai-blog": "node -e \"const { generateRandomBlog } = require('./src/services/groqService'); generateRandomBlog().then(result => { console.log('✅ AI Blog:', result.title); console.log('Excerpt:', result.excerpt); }).catch(err => console.error('❌ Hata:', err.message));\"",
+    "update-excerpts": "node src/utils/updateExcerpts.js"
   },
   "keywords": ["blog", "api", "nodejs", "express", "mongodb"],
   "author": "Abdullah",
@@ -37,7 +39,9 @@
     "dotenv": "^16.3.1",
     "express-validator": "^7.0.1",
     "compression": "^1.7.4",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "axios": "^1.6.2",
+    "node-cron": "^3.0.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.2",

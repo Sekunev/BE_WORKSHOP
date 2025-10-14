@@ -33,12 +33,12 @@
 <body>
     <div class="container">
         <h1>📊 Proje Durumu Raporu</h1>
-        <p class="timestamp">Son güncelleme: 24.09.2025 22:05:57</p>
+        <p class="timestamp">Son güncelleme: 08.10.2025 21:02:01</p>
         
         <h2>📈 Genel İstatistikler</h2>
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number">18</div>
+                <div class="stat-number">20</div>
                 <div class="stat-label">Toplam Endpoint</div>
             </div>
             <div class="stat-card">
@@ -57,7 +57,7 @@
                 <tr><th>Method</th><th>Sayı</th><th>Yüzde</th></tr>
             </thead>
             <tbody>
-                <tr><td class="method-post">POST</td><td>4</td><td>22.2%</td></tr><tr><td class="method-get">GET</td><td>9</td><td>50.0%</td></tr><tr><td class="method-put">PUT</td><td>3</td><td>16.7%</td></tr><tr><td class="method-delete">DELETE</td><td>2</td><td>11.1%</td></tr>
+                <tr><td class="method-post">POST</td><td>5</td><td>25.0%</td></tr><tr><td class="method-get">GET</td><td>10</td><td>50.0%</td></tr><tr><td class="method-put">PUT</td><td>3</td><td>15.0%</td></tr><tr><td class="method-delete">DELETE</td><td>2</td><td>10.0%</td></tr>
             </tbody>
         </table>
         
@@ -67,7 +67,7 @@
                 <tr><th>Erişim</th><th>Sayı</th><th>Yüzde</th></tr>
             </thead>
             <tbody>
-                <tr><td class="access-private">Private</td><td>4</td><td>22.2%</td></tr><tr><td class="access-admin">Private/Admin</td><td>14</td><td>77.8%</td></tr>
+                <tr><td class="access-private">Private</td><td>6</td><td>30.0%</td></tr><tr><td class="access-admin">Private/Admin</td><td>14</td><td>70.0%</td></tr>
             </tbody>
         </table>
         
@@ -86,6 +86,12 @@
           </div>
         
           <div class="endpoint-item">
+            <strong>GET /debug</strong><br>
+            <span style="color: #7f8c8d;">GET /debug</span><br>
+            <small>Erişim: Private | Route: auth</small>
+          </div>
+        
+          <div class="endpoint-item">
             <strong>GET /me</strong><br>
             <span style="color: #7f8c8d;">GET /me</span><br>
             <small>Erişim: Private | Route: auth</small>
@@ -98,8 +104,32 @@
           </div>
         
           <div class="endpoint-item">
+            <strong>POST /refresh</strong><br>
+            <span style="color: #7f8c8d;">POST /refresh</span><br>
+            <small>Erişim: Private | Route: auth</small>
+          </div>
+        
+          <div class="endpoint-item">
             <strong>GET /</strong><br>
             <span style="color: #7f8c8d;">GET /</span><br>
+            <small>Erişim: Private/Admin | Route: blog</small>
+          </div>
+        
+          <div class="endpoint-item">
+            <strong>GET /categories</strong><br>
+            <span style="color: #7f8c8d;">GET /categories</span><br>
+            <small>Erişim: Private/Admin | Route: blog</small>
+          </div>
+        
+          <div class="endpoint-item">
+            <strong>GET /tags</strong><br>
+            <span style="color: #7f8c8d;">GET /tags</span><br>
+            <small>Erişim: Private/Admin | Route: blog</small>
+          </div>
+        
+          <div class="endpoint-item">
+            <strong>GET /my-blogs</strong><br>
+            <span style="color: #7f8c8d;">GET /my-blogs</span><br>
             <small>Erişim: Private/Admin | Route: blog</small>
           </div>
         
@@ -128,26 +158,8 @@
           </div>
         
           <div class="endpoint-item">
-            <strong>GET /my-blogs</strong><br>
-            <span style="color: #7f8c8d;">GET /my-blogs</span><br>
-            <small>Erişim: Private/Admin | Route: blog</small>
-          </div>
-        
-          <div class="endpoint-item">
             <strong>POST /:id/like</strong><br>
             <span style="color: #7f8c8d;">POST /:id/like</span><br>
-            <small>Erişim: Private/Admin | Route: blog</small>
-          </div>
-        
-          <div class="endpoint-item">
-            <strong>GET /categories</strong><br>
-            <span style="color: #7f8c8d;">GET /categories</span><br>
-            <small>Erişim: Private/Admin | Route: blog</small>
-          </div>
-        
-          <div class="endpoint-item">
-            <strong>GET /tags</strong><br>
-            <span style="color: #7f8c8d;">GET /tags</span><br>
             <small>Erişim: Private/Admin | Route: blog</small>
           </div>
         
@@ -211,7 +223,7 @@
         </table>
         
         <div class="timestamp">
-            Bu rapor 24.09.2025 22:05:57 tarihinde otomatik oluşturulmuştur.
+            Bu rapor 08.10.2025 21:02:01 tarihinde otomatik oluşturulmuştur.
         </div>
     </div>
 </body>

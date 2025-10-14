@@ -17,6 +17,15 @@ export interface Blog {
   createdAt: string;
   updatedAt: string;
   publishedAt?: string;
+  aiGenerated?: boolean;
+  aiMetadata?: {
+    konu: string;
+    tarz: string;
+    kelimeSayisi: number;
+    hedefKitle: string;
+    model: string;
+    generatedAt: string;
+  };
   author: {
     _id: string;
     name: string;

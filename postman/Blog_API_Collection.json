@@ -63,9 +63,19 @@
                 "exec": [
                   "if (pm.response.code === 201) {",
                   "    const response = pm.response.json();",
-                  "    pm.collectionVariables.set('accessToken', response.data.accessToken.token);",
-                  "    pm.collectionVariables.set('refreshToken', response.data.refreshToken.token);",
-                  "    console.log('Tokens saved:', response.data.accessToken.token);",
+                  "    ",
+                  "    const accessToken = response.data.accessToken.token.trim();",
+                  "    const refreshToken = response.data.refreshToken.token.trim();",
+                  "    ",
+                  "    pm.collectionVariables.set('accessToken', accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', refreshToken);",
+                  "    ",
+                  "    if (pm.environment.name) {",
+                  "        pm.environment.set('accessToken', accessToken);",
+                  "        pm.environment.set('refreshToken', refreshToken);",
+                  "    }",
+                  "    ",
+                  "    console.log('✅ Register başarılı! Token kaydedildi.');",
                   "}"
                 ]
               }
@@ -100,12 +110,26 @@
                 "exec": [
                   "if (pm.response.code === 200) {",
                   "    const response = pm.response.json();",
-                  "    pm.collectionVariables.set('accessToken', response.data.accessToken.token);",
-                  "    pm.collectionVariables.set('refreshToken', response.data.refreshToken.token);",
-                  "    console.log('Access Token:', response.data.accessToken.token);",
-                  "    console.log('Refresh Token:', response.data.refreshToken.token);",
-                  "    console.log('Expires At:', response.data.accessToken.expiresAt);",
-                  "    console.log('Token saved to collection variables');",
+                  "    ",
+                  "    // Token'ları al ve temizle",
+                  "    const accessToken = response.data.accessToken.token.trim();",
+                  "    const refreshToken = response.data.refreshToken.token.trim();",
+                  "    ",
+                  "    // Collection variables'a kaydet",
+                  "    pm.collectionVariables.set('accessToken', accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', refreshToken);",
+                  "    ",
+                  "    // Environment variables'a da kaydet (eğer environment varsa)",
+                  "    if (pm.environment.name) {",
+                  "        pm.environment.set('accessToken', accessToken);",
+                  "        pm.environment.set('refreshToken', refreshToken);",
+                  "    }",
+                  "    ",
+                  "    console.log('✅ Login başarılı!');",
+                  "    console.log('🎫 Access Token:', accessToken.substring(0, 50) + '...');",
+                  "    console.log('🔄 Refresh Token:', refreshToken.substring(0, 50) + '...');",
+                  "    console.log('⏰ Expires:', response.data.accessToken.expiresAt);",
+                  "    console.log('💾 Token kaydedildi (collection & environment)');",
                   "}"
                 ]
               }
@@ -128,7 +152,21 @@
               "path": ["auth", "debug"]
             },
             "description": "Token debug bilgileri"
-          }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Token kontrolü",
+                  "const token = pm.collectionVariables.get('accessToken') || pm.environment.get('accessToken');",
+                  "console.log('📋 Kullanılan Token:', token ? token.substring(0, 50) + '...' : 'YOK!');",
+                  "console.log('📦 Collection Token:', pm.collectionVariables.get('accessToken') ? 'VAR' : 'YOK');",
+                  "console.log('🌍 Environment Token:', pm.environment.get('accessToken') ? 'VAR' : 'YOK');"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Get Me",
@@ -176,9 +214,19 @@
                 "exec": [
                   "if (pm.response.code === 200) {",
                   "    const response = pm.response.json();",
-                  "    pm.collectionVariables.set('accessToken', response.data.accessToken.token);",
-                  "    pm.collectionVariables.set('refreshToken', response.data.refreshToken.token);",
-                  "    console.log('Tokens refreshed successfully');",
+                  "    ",
+                  "    const accessToken = response.data.accessToken.token.trim();",
+                  "    const refreshToken = response.data.refreshToken.token.trim();",
+                  "    ",
+                  "    pm.collectionVariables.set('accessToken', accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', refreshToken);",
+                  "    ",
+                  "    if (pm.environment.name) {",
+                  "        pm.environment.set('accessToken', accessToken);",
+                  "        pm.environment.set('refreshToken', refreshToken);",
+                  "    }",
+                  "    ",
+                  "    console.log('✅ Token yenilendi!');",
                   "}"
                 ]
               }
@@ -456,6 +504,109 @@
               "path": ["blogs", "tags"]
             },
             "description": "Popüler etiketleri getir"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Blogs",
+      "item": [
+        {
+          "name": "Generate AI Blog",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"konu\": \"Yapay Zeka İş Dünyasını Nasıl Dönüştürüyor?\",\n  \"tarz\": \"profesyonel\",\n  \"kelimeSayisi\": 1200,\n  \"hedefKitle\": \"profesyoneller\",\n  \"autoPublish\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/blogs/ai/generate",
+              "host": ["{{baseUrl}}"],
+              "path": ["blogs", "ai", "generate"]
+            },
+            "description": "AI ile parametreli blog oluştur (Admin only)"
+          }
+        },
+        {
+          "name": "Generate Random AI Blog",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"autoPublish\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/blogs/ai/generate-random",
+              "host": ["{{baseUrl}}"],
+              "path": ["blogs", "ai", "generate-random"]
+            },
+            "description": "Rastgele AI blog oluştur (Admin only)"
+          }
+        },
+        {
+          "name": "Get AI Topics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/blogs/ai/topics",
+              "host": ["{{baseUrl}}"],
+              "path": ["blogs", "ai", "topics"]
+            },
+            "description": "Kullanılmış ve kullanılmamış blog konularını getir (Admin only)"
+          }
+        },
+        {
+          "name": "Get AI Blogs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/blogs/ai/blogs?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["blogs", "ai", "blogs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "AI ile oluşturulan blogları listele (Admin only)"
           }
         }
       ]

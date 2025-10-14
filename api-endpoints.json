@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-09-24T19:05:57.109Z",
+  "timestamp": "2025-10-08T18:02:01.314Z",
   "endpoints": [
     {
       "method": "POST",
@@ -15,6 +15,16 @@
       "method": "POST",
       "path": "/login",
       "summary": "POST /login",
+      "tags": [
+        "auth"
+      ],
+      "access": "Private",
+      "routeName": "auth"
+    },
+    {
+      "method": "GET",
+      "path": "/debug",
+      "summary": "GET /debug",
       "tags": [
         "auth"
       ],
@@ -42,9 +52,49 @@
       "routeName": "auth"
     },
     {
+      "method": "POST",
+      "path": "/refresh",
+      "summary": "POST /refresh",
+      "tags": [
+        "auth"
+      ],
+      "access": "Private",
+      "routeName": "auth"
+    },
+    {
       "method": "GET",
       "path": "/",
       "summary": "GET /",
+      "tags": [
+        "blog"
+      ],
+      "access": "Private/Admin",
+      "routeName": "blog"
+    },
+    {
+      "method": "GET",
+      "path": "/categories",
+      "summary": "GET /categories",
+      "tags": [
+        "blog"
+      ],
+      "access": "Private/Admin",
+      "routeName": "blog"
+    },
+    {
+      "method": "GET",
+      "path": "/tags",
+      "summary": "GET /tags",
+      "tags": [
+        "blog"
+      ],
+      "access": "Private/Admin",
+      "routeName": "blog"
+    },
+    {
+      "method": "GET",
+      "path": "/my-blogs",
+      "summary": "GET /my-blogs",
       "tags": [
         "blog"
       ],
@@ -92,39 +142,9 @@
       "routeName": "blog"
     },
     {
-      "method": "GET",
-      "path": "/my-blogs",
-      "summary": "GET /my-blogs",
-      "tags": [
-        "blog"
-      ],
-      "access": "Private/Admin",
-      "routeName": "blog"
-    },
-    {
       "method": "POST",
       "path": "/:id/like",
       "summary": "POST /:id/like",
-      "tags": [
-        "blog"
-      ],
-      "access": "Private/Admin",
-      "routeName": "blog"
-    },
-    {
-      "method": "GET",
-      "path": "/categories",
-      "summary": "GET /categories",
-      "tags": [
-        "blog"
-      ],
-      "access": "Private/Admin",
-      "routeName": "blog"
-    },
-    {
-      "method": "GET",
-      "path": "/tags",
-      "summary": "GET /tags",
       "tags": [
         "blog"
       ],
@@ -335,21 +355,21 @@
     }
   ],
   "stats": {
-    "totalEndpoints": 18,
+    "totalEndpoints": 20,
     "totalModels": 3,
     "totalMiddlewares": 3,
     "endpointsByMethod": {
-      "POST": 4,
-      "GET": 9,
+      "POST": 5,
+      "GET": 10,
       "PUT": 3,
       "DELETE": 2
     },
     "endpointsByAccess": {
-      "Private": 4,
+      "Private": 6,
       "Private/Admin": 14
     },
     "endpointsByRoute": {
-      "auth": 4,
+      "auth": 6,
       "blog": 9,
       "user": 5
     }
