@@ -75,3 +75,9 @@ jspm_packages/
 
 # Uploads
 uploads/
+
+# kiro
+.kiro
+
+# cursor
+.cursor
