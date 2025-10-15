@@ -24,8 +24,8 @@ class BlogScheduler {
 
     console.log('🤖 Blog scheduler başlatılıyor...');
 
-    // Her gün saat 11:50'te blog oluştur
-    const dailyTask = cron.schedule('50 11 * * *', async () => {
+    // Her gün saat 11:55'te blog oluştur
+    const dailyTask = cron.schedule('55 11 * * *', async () => {
       console.log('📝 Günlük otomatik blog oluşturuluyor...');
       await this.createScheduledBlog();
     }, {
@@ -67,7 +67,7 @@ class BlogScheduler {
     this.isRunning = true;
 
     console.log('✅ Blog scheduler başarıyla başlatıldı');
-    console.log('📅 Günlük blog: Her gün 11:50');
+    console.log('📅 Günlük blog: Her gün 11:55');
     console.log('📅 Haftalık blog: Pazartesi ve Perşembe 14:00');
     if (testTask) {
       console.log('🧪 Test modu: Her 2 saatte bir');
@@ -198,7 +198,7 @@ class BlogScheduler {
       isRunning: this.isRunning,
       taskCount: this.tasks.length,
       schedules: [
-        { name: 'Günlük Blog', cron: '50 11 * * *', description: 'Her gün saat 11:50' },
+        { name: 'Günlük Blog', cron: '55 11 * * *', description: 'Her gün saat 11:55' },
         { name: 'Haftalık Blog', cron: '0 14 * * 1,4', description: 'Pazartesi ve Perşembe 14:00' }
       ]
     };
