@@ -179,7 +179,7 @@ class BlogScheduler {
       isRunning: this.isRunning,
       taskCount: this.tasks.length,
       schedules: [
-        { name: 'Günlük Blog', cron: '0 9 * * *', description: 'Her gün saat 09:00' },
+        { name: 'Günlük Blog', cron: '0 11 * * *', description: 'Her gün saat 09:00' },
         { name: 'Haftalık Blog', cron: '0 14 * * 1,4', description: 'Pazartesi ve Perşembe 14:00' }
       ]
     };
