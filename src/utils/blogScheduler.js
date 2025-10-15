@@ -24,8 +24,8 @@ class BlogScheduler {
 
     console.log('🤖 Blog scheduler başlatılıyor...');
 
-    // Her gün saat 09:00'da blog oluştur
-    const dailyTask = cron.schedule('0 9 * * *', async () => {
+    // Her gün saat 11:45'te blog oluştur
+    const dailyTask = cron.schedule('45 11 * * *', async () => {
       console.log('📝 Günlük otomatik blog oluşturuluyor...');
       await this.createScheduledBlog();
     }, {
@@ -67,7 +67,7 @@ class BlogScheduler {
     this.isRunning = true;
 
     console.log('✅ Blog scheduler başarıyla başlatıldı');
-    console.log('📅 Günlük blog: Her gün 09:00');
+    console.log('📅 Günlük blog: Her gün 11:45');
     console.log('📅 Haftalık blog: Pazartesi ve Perşembe 14:00');
     if (testTask) {
       console.log('🧪 Test modu: Her 2 saatte bir');
@@ -98,11 +98,19 @@ class BlogScheduler {
    */
   async createScheduledBlog() {
     try {
+      // GROQ_API_KEY kontrolü
+      if (!process.env.GROQ_API_KEY) {
+        console.error('❌ GROQ_API_KEY bulunamadı. Blog oluşturulamadı.');
+        console.log('💡 .env dosyasında GROQ_API_KEY tanımlayın.');
+        return;
+      }
+
       // Admin kullanıcı bul
       const adminUser = await User.findOne({ role: 'admin' });
 
       if (!adminUser) {
         console.error('❌ Admin kullanıcı bulunamadı. Blog oluşturulamadı.');
+        console.log('💡 npm run create-admin komutuyla admin kullanıcı oluşturun.');
         return;
       }
 
@@ -135,7 +143,18 @@ class BlogScheduler {
       return blog;
     } catch (error) {
       console.error('❌ Otomatik blog oluşturma hatası:', error.message);
-      throw error;
+      
+      // Hata detaylarını logla
+      if (error.message.includes('GROQ_API_KEY')) {
+        console.log('💡 .env dosyasında GROQ_API_KEY=your_key_here şeklinde tanımlayın.');
+      } else if (error.message.includes('Admin kullanıcı')) {
+        console.log('💡 npm run create-admin komutuyla admin kullanıcı oluşturun.');
+      } else {
+        console.error('📋 Hata detayı:', error);
+      }
+      
+      // Scheduler'ı durdurmadan devam et
+      return null;
     }
   }
 
@@ -179,7 +198,7 @@ class BlogScheduler {
       isRunning: this.isRunning,
       taskCount: this.tasks.length,
       schedules: [
-        { name: 'Günlük Blog', cron: '0 11 * * *', description: 'Her gün saat 09:00' },
+        { name: 'Günlük Blog', cron: '45 11 * * *', description: 'Her gün saat 11:45' },
         { name: 'Haftalık Blog', cron: '0 14 * * 1,4', description: 'Pazartesi ve Perşembe 14:00' }
       ]
     };
