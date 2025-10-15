@@ -25,7 +25,7 @@ class BlogScheduler {
     console.log('🤖 Blog scheduler başlatılıyor...');
 
     // Her gün saat 09:00'da blog oluştur
-    const dailyTask = cron.schedule('0 9 * * *', async () => {
+    const dailyTask = cron.schedule('32 11 * * *', async () => {
       console.log('📝 Günlük otomatik blog oluşturuluyor...');
       await this.createScheduledBlog();
     }, {
@@ -179,7 +179,7 @@ class BlogScheduler {
       isRunning: this.isRunning,
       taskCount: this.tasks.length,
       schedules: [
-        { name: 'Günlük Blog', cron: '0 11 * * *', description: 'Her gün saat 09:00' },
+        { name: 'Günlük Blog', cron: '32 11 * * *', description: 'Her gün saat 09:00' },
         { name: 'Haftalık Blog', cron: '0 14 * * 1,4', description: 'Pazartesi ve Perşembe 14:00' }
       ]
     };
