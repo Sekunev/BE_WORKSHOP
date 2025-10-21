@@ -1,0 +1,92 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'blog-mobile-app/**'
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: blog-mobile-app/package-lock.json
+        
+    - name: Install dependencies
+      working-directory: blog-mobile-app
+      run: npm ci
+      
+    - name: Run TypeScript check
+      working-directory: blog-mobile-app
+      run: npm run typecheck
+      
+    - name: Run ESLint
+      working-directory: blog-mobile-app
+      run: npm run lint
+      
+    - name: Run Prettier check
+      working-directory: blog-mobile-app
+      run: npx prettier --check "src/**/*.{ts,tsx,js,jsx}"
+      
+    - name: Run tests with coverage
+      working-directory: blog-mobile-app
+      run: npm test -- --coverage --watchAll=false
+      
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: blog-mobile-app/coverage/lcov.info
+        flags: mobile-app
+        name: blog-mobile-app-coverage
+        
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run npm audit
+      working-directory: blog-mobile-app
+      run: npm audit --audit-level moderate
+      
+    - name: Run Snyk security scan
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --file=blog-mobile-app/package.json
+        
+  build-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: blog-mobile-app/package-lock.json
+        
+    - name: Install dependencies
+      working-directory: blog-mobile-app
+      run: npm ci
+      
+    - name: Check Metro bundler
+      working-directory: blog-mobile-app
+      run: |
+        timeout 30s npm start &
+        sleep 20
+        curl -f http://localhost:8081/status || exit 1

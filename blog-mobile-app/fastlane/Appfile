@@ -1,0 +1,21 @@
+# Fastlane Appfile Configuration
+
+# iOS Configuration
+app_identifier("com.blogapp.mobile") # The bundle identifier of your app
+apple_id("your-apple-id@email.com") # Your Apple email address
+
+itc_team_id("123456789") # App Store Connect Team ID
+team_id("ABCDEFGHIJ") # Developer Portal Team ID (Team ID, not Team Name)
+
+# Android Configuration
+json_key_file("./android/google-play-service-account.json") # Path to the json secret file
+package_name("com.blogapp.mobile") # e.g. com.krausefx.app
+
+# Optional: Specify the Apple ID password
+# apple_id_password("your-password")
+
+# Optional: Specify the Apple ID two-factor authentication code
+# apple_id_2fa_code("123456")
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile

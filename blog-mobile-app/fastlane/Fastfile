@@ -1,0 +1,184 @@
+# Fastlane Configuration for Blog Mobile App
+
+default_platform(:ios)
+
+# Global variables
+APP_NAME = "BlogMobileApp"
+SCHEME_NAME = "BlogMobileApp"
+WORKSPACE_PATH = "./ios/#{APP_NAME}.xcworkspace"
+
+platform :ios do
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    # Increment build number
+    increment_build_number(
+      xcodeproj: "./ios/#{APP_NAME}.xcodeproj"
+    )
+    
+    # Build the app
+    build_app(
+      workspace: WORKSPACE_PATH,
+      scheme: SCHEME_NAME,
+      configuration: "Release",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "com.blogapp.mobile" => "Blog Mobile App Distribution Profile"
+        }
+      }
+    )
+    
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      changelog: "Bug fixes and performance improvements"
+    )
+    
+    # Send notification
+    slack(
+      message: "iOS build uploaded to TestFlight successfully! 🚀",
+      channel: "#mobile-releases"
+    ) if ENV["SLACK_URL"]
+  end
+  
+  desc "Build and upload to App Store"
+  lane :release do
+    # Increment version number
+    increment_version_number(
+      xcodeproj: "./ios/#{APP_NAME}.xcodeproj"
+    )
+    
+    # Build the app
+    build_app(
+      workspace: WORKSPACE_PATH,
+      scheme: SCHEME_NAME,
+      configuration: "Release",
+      export_method: "app-store"
+    )
+    
+    # Upload to App Store
+    upload_to_app_store(
+      force: true,
+      reject_if_possible: true,
+      skip_metadata: false,
+      skip_screenshots: false,
+      submit_for_review: false
+    )
+    
+    # Send notification
+    slack(
+      message: "iOS app uploaded to App Store Connect! 📱",
+      channel: "#mobile-releases"
+    ) if ENV["SLACK_URL"]
+  end
+  
+  desc "Run tests"
+  lane :test do
+    run_tests(
+      workspace: WORKSPACE_PATH,
+      scheme: SCHEME_NAME,
+      device: "iPhone 15"
+    )
+  end
+  
+  desc "Take screenshots"
+  lane :screenshots do
+    capture_screenshots(
+      workspace: WORKSPACE_PATH,
+      scheme: SCHEME_NAME
+    )
+  end
+end
+
+platform :android do
+  desc "Build and upload to Google Play Internal Testing"
+  lane :beta do
+    # Increment version code
+    increment_version_code(
+      gradle_file_path: "./android/app/build.gradle"
+    )
+    
+    # Build the app
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "./android/"
+    )
+    
+    # Upload to Google Play
+    upload_to_play_store(
+      track: "internal",
+      aab: "./android/app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+    
+    # Send notification
+    slack(
+      message: "Android build uploaded to Google Play Internal Testing! 🤖",
+      channel: "#mobile-releases"
+    ) if ENV["SLACK_URL"]
+  end
+  
+  desc "Build and upload to Google Play Production"
+  lane :release do
+    # Build the app
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "./android/"
+    )
+    
+    # Upload to Google Play
+    upload_to_play_store(
+      track: "production",
+      aab: "./android/app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+    
+    # Send notification
+    slack(
+      message: "Android app uploaded to Google Play Production! 🚀",
+      channel: "#mobile-releases"
+    ) if ENV["SLACK_URL"]
+  end
+  
+  desc "Run tests"
+  lane :test do
+    gradle(
+      task: "test",
+      project_dir: "./android/"
+    )
+  end
+end
+
+# Cross-platform lanes
+desc "Run tests on both platforms"
+lane :test_all do
+  ios_test
+  android_test
+end
+
+desc "Deploy to beta on both platforms"
+lane :beta_all do
+  ios_beta
+  android_beta
+end
+
+desc "Deploy to production on both platforms"
+lane :release_all do
+  ios_release
+  android_release
+end
+
+# Error handling
+error do |lane, exception|
+  slack(
+    message: "❌ Fastlane failed in lane: #{lane}. Error: #{exception.message}",
+    channel: "#mobile-releases",
+    success: false
+  ) if ENV["SLACK_URL"]
+end

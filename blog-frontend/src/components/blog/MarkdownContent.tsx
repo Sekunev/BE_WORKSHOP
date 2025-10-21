@@ -14,14 +14,66 @@ interface MarkdownContentProps {
 }
 
 export function MarkdownContent({ content, className = '' }: MarkdownContentProps) {
-  // Content'i düzelt - yan yana gelen ## karakterlerini ayır
-  const cleanedContent = content
-    .replace(/##\s*###/g, '\n\n###') // ## ### kombinasyonunu ### yap ve öncesinde boş satır ekle
-    .replace(/##([^#\n])/g, '## $1') // ## karakterinden sonra boşluk ekle (newline hariç)
-    .replace(/###([^#\n])/g, '### $1') // ### karakterinden sonra boşluk ekle (newline hariç)
-    .replace(/\n##/g, '\n\n##') // ## öncesinde boş satır ekle
-    .replace(/\n###/g, '\n\n###') // ### öncesinde boş satır ekle
-    .replace(/\n\n\n+/g, '\n\n'); // Çoklu boş satırları ikiye düşür
+  /**
+   * AI tarafından üretilen Markdown içeriğini temizler ve düzeltir.
+   * @param {string} content - Temizlenecek ham Markdown içeriği.
+   * @returns {string} - Temizlenmiş ve düzenlenmiş Markdown içeriği.
+   */
+  function cleanMarkdownContent(content: string) {
+    if (!content || typeof content !== 'string') {
+      return '';
+    }
+
+    let cleanedContent = content.trim();
+
+    // --- 1. Başlıkları (Headings) Düzelt ---
+
+    // Birleşik başlıkları ayır (örn: "## ###" -> "###")
+    // Satır başındaki # karakterlerini yakala ve ardından gelen gereksiz # karakterlerini temizle.
+    cleanedContent = cleanedContent.replace(/^(#{1,6})\s*#{1,6}/gm, '$1');
+
+    // Başlıktan sonra boşluk ekle (örn: "##Başlık" -> "## Başlık")
+    // Satır başındaki # karakterlerinden sonra boşluk yoksa ekle.
+    cleanedContent = cleanedContent.replace(/^(#{1,6})([^\s#])/gm, '$1 $2');
+
+    // Başlıklardan önce doğru sayıda boşluk ekle
+    // Bir metinden hemen sonra gelen bir başlığı, iki satır aşağıya indir.
+    cleanedContent = cleanedContent.replace(/([^\n])\n(#{1,6})/g, '$1\n\n$2');
+
+    // --- 2. Diğer Yaygın Markdown Hatalarını Düzelt ---
+
+    // Kalın ve italik metinlerdeki gereksiz boşlukları temizle (örn: "** metin **" -> "**metin**")
+    cleanedContent = cleanedContent.replace(/\*\*\s+([^*]+?)\s+\*\*/g, '**$1**');
+    cleanedContent = cleanedContent.replace(/\*\s+([^*]+?)\s+\*/g, '*$1*');
+
+    // Linklerdeki gereksiz boşlukları temizle (örn: "[ metin ] ( url )" -> "[metin](url)")
+    cleanedContent = cleanedContent.replace(/\[([^\]]+?)\]\s+\(([^)]+?)\)/g, '[$1]($2)');
+
+    // Liste elemanlarından sonra boşluk ekle (örn: "*madde" -> "* madde")
+    cleanedContent = cleanedContent.replace(/^(\*|\+|\-|\d+\.)\s*([^\s])/gm, '$1 $2');
+
+    // --- 3. Nihai Temizlik ---
+
+    // Üç veya daha fazla boş satırlı iki satıra düşür.
+    cleanedContent = cleanedContent.replace(/\n{3,}/g, '\n\n');
+
+    return cleanedContent;
+  }
+
+  // ÖRNEK KULLANIM:
+  const aiGeneratedContent = `
+Bu bir paragraf.##Hatalı Başlık
+Bir önceki başlıktan sonra boşluk yok.
+Bu başka bir paragraf.###Alt Başlık
+## ### Birleşik Başlık
+Bu da ** kalın metin ** ve * italik metin *.
+*Liste elemanı1
+* Liste elemanı2
+[Bağlantı metni] (https://example.com)
+`;
+
+  const cleanedContent = cleanMarkdownContent(content);
+  console.log(cleanedContent);
 
   return (
     <div className={`markdown-content ${className}`}>

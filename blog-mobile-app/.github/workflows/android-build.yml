@@ -1,0 +1,110 @@
+name: Android Build and Deploy
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: blog-mobile-app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: blog-mobile-app
+        run: npm ci
+
+      - name: Run TypeScript check
+        working-directory: blog-mobile-app
+        run: npm run typecheck
+
+      - name: Run ESLint
+        working-directory: blog-mobile-app
+        run: npm run lint
+
+      - name: Run tests
+        working-directory: blog-mobile-app
+        run: npm test -- --coverage --watchAll=false
+
+  build-android:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: blog-mobile-app/package-lock.json
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        working-directory: blog-mobile-app
+        run: npm ci
+
+      - name: Create keystore from secrets
+        working-directory: blog-mobile-app/android
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > keystore/blog-mobile-app-release.keystore
+
+      - name: Create keystore.properties
+        working-directory: blog-mobile-app/android
+        run: |
+          echo "BLOG_MOBILE_APP_UPLOAD_STORE_FILE=keystore/blog-mobile-app-release.keystore" > keystore.properties
+          echo "BLOG_MOBILE_APP_UPLOAD_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}" >> keystore.properties
+          echo "BLOG_MOBILE_APP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> keystore.properties
+          echo "BLOG_MOBILE_APP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}" >> keystore.properties
+
+      - name: Build Android APK
+        working-directory: blog-mobile-app
+        run: npm run build:android
+
+      - name: Build Android Bundle
+        working-directory: blog-mobile-app
+        run: npm run build:android:bundle
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: blog-mobile-app/android/app/build/outputs/apk/release/
+
+      - name: Upload Bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-bundle
+          path: blog-mobile-app/android/app/build/outputs/bundle/release/
+
+      - name: Deploy to Google Play Console
+        if: github.ref == 'refs/heads/main'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.blogapp.mobile
+          releaseFiles: blog-mobile-app/android/app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
