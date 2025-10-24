@@ -19,7 +19,7 @@ export function MarkdownContent({ content, className = '' }: MarkdownContentProp
    * @param {string} content - Temizlenecek ham Markdown içeriği.
    * @returns {string} - Temizlenmiş ve düzenlenmiş Markdown içeriği.
    */
-  function cleanMarkdownContent(content: string) {
+  function cleanMarkdownContent(content: string): string {
     if (!content || typeof content !== 'string') {
       return '';
     }
@@ -28,52 +28,65 @@ export function MarkdownContent({ content, className = '' }: MarkdownContentProp
 
     // --- 1. Başlıkları (Headings) Düzelt ---
 
-    // Birleşik başlıkları ayır (örn: "## ###" -> "###")
-    // Satır başındaki # karakterlerini yakala ve ardından gelen gereksiz # karakterlerini temizle.
-    cleanedContent = cleanedContent.replace(/^(#{1,6})\s*#{1,6}/gm, '$1');
-
     // Başlıktan sonra boşluk ekle (örn: "##Başlık" -> "## Başlık")
-    // Satır başındaki # karakterlerinden sonra boşluk yoksa ekle.
     cleanedContent = cleanedContent.replace(/^(#{1,6})([^\s#])/gm, '$1 $2');
 
-    // Başlıklardan önce doğru sayıda boşluk ekle
-    // Bir metinden hemen sonra gelen bir başlığı, iki satır aşağıya indir.
-    cleanedContent = cleanedContent.replace(/([^\n])\n(#{1,6})/g, '$1\n\n$2');
+    // Birleşik başlıkları ayır (örn: "## ###" -> "###")
+    cleanedContent = cleanedContent.replace(/^(#{1,6})\s*#{1,6}/gm, '$1');
 
-    // --- 2. Diğer Yaygın Markdown Hatalarını Düzelt ---
+    // KRITIK DÜZELTME: Başlık ve metin arasındaki boşlukları düzelt
+    // Metin + başlık arasına boşluk ekle
+    cleanedContent = cleanedContent.replace(/([.!?])\n(#{1,6}\s)/g, '$1\n\n$2');
+    cleanedContent = cleanedContent.replace(/([^\n])\n(#{1,6}\s)/g, '$1\n\n$2');
 
-    // Kalın ve italik metinlerdeki gereksiz boşlukları temizle (örn: "** metin **" -> "**metin**")
-    cleanedContent = cleanedContent.replace(/\*\*\s+([^*]+?)\s+\*\*/g, '**$1**');
-    cleanedContent = cleanedContent.replace(/\*\s+([^*]+?)\s+\*/g, '*$1*');
+    // Başlık + metin arasına boşluk ekle  
+    cleanedContent = cleanedContent.replace(/(#{1,6}[^\n]*)\n([A-ZÜĞŞÇÖİa-züğşçöı])/g, '$1\n\n$2');
 
-    // Linklerdeki gereksiz boşlukları temizle (örn: "[ metin ] ( url )" -> "[metin](url)")
-    cleanedContent = cleanedContent.replace(/\[([^\]]+?)\]\s+\(([^)]+?)\)/g, '[$1]($2)');
+    // Soru işareti sonrası başlık için özel durum
+    cleanedContent = cleanedContent.replace(/(\?)\n(#{1,6})/g, '$1\n\n$2');
+
+    // --- 2. Liste Düzeltmeleri ---
 
     // Liste elemanlarından sonra boşluk ekle (örn: "*madde" -> "* madde")
     cleanedContent = cleanedContent.replace(/^(\*|\+|\-|\d+\.)\s*([^\s])/gm, '$1 $2');
 
-    // --- 3. Nihai Temizlik ---
+    // Liste öncesi boşluk ekle
+    cleanedContent = cleanedContent.replace(/([^\n])\n(\*|\+|\-|\d+\.)/g, '$1\n\n$2');
 
-    // Üç veya daha fazla boş satırlı iki satıra düşür.
+    // Liste sonrası boşluk ekle
+    cleanedContent = cleanedContent.replace(/(\*|\+|\-|\d+\.[^\n]*)\n([^*\-+\d\n\s])/g, '$1\n\n$2');
+
+    // --- 3. Diğer Markdown Düzeltmeleri ---
+
+    // Kalın ve italik metinlerdeki gereksiz boşlukları temizle
+    cleanedContent = cleanedContent.replace(/\*\*\s+([^*]+?)\s+\*\*/g, '**$1**');
+    cleanedContent = cleanedContent.replace(/\*\s+([^*]+?)\s+\*/g, '*$1*');
+
+    // Linklerdeki gereksiz boşlukları temizle
+    cleanedContent = cleanedContent.replace(/\[([^\]]+?)\]\s+\(([^)]+?)\)/g, '[$1]($2)');
+
+    // --- 4. Nihai Temizlik ---
+
+    // Üç veya daha fazla boş satırı iki satıra düşür
     cleanedContent = cleanedContent.replace(/\n{3,}/g, '\n\n');
+
+    // Başlangıç ve bitişteki fazla boşlukları temizle
+    cleanedContent = cleanedContent.trim();
 
     return cleanedContent;
   }
 
-  // ÖRNEK KULLANIM:
-  const aiGeneratedContent = `
-Bu bir paragraf.##Hatalı Başlık
-Bir önceki başlıktan sonra boşluk yok.
-Bu başka bir paragraf.###Alt Başlık
-## ### Birleşik Başlık
-Bu da ** kalın metin ** ve * italik metin *.
-*Liste elemanı1
-* Liste elemanı2
-[Bağlantı metni] (https://example.com)
-`;
-
   const cleanedContent = cleanMarkdownContent(content);
-  console.log(cleanedContent);
+
+  // Debug için - geliştirme sırasında görmek için
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Original content:', content.substring(0, 200) + '...');
+    console.log('Cleaned content:', cleanedContent.substring(0, 200) + '...');
+
+    // Test: Başlık ve paragraf arasında boşluk var mı?
+    const hasProperSpacing = /#{1,6}[^\n]*\n\n[^#]/.test(cleanedContent);
+    console.log('Has proper heading spacing:', hasProperSpacing);
+  }
 
   return (
     <div className={`markdown-content ${className}`}>

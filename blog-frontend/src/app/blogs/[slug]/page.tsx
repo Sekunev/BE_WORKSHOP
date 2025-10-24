@@ -243,7 +243,7 @@ export default function BlogDetailPage() {
           <div className="p-8">
             <MarkdownContent 
               content={blog.content}
-              className="prose prose-lg max-w-none"
+              className="max-w-none"
             />
             
             {/* AI Metadata */}
