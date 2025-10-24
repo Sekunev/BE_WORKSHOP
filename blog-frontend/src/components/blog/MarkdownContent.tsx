@@ -31,9 +31,20 @@ export function MarkdownContent({ content, className = '' }: MarkdownContentProp
     const processedLines: string[] = [];
 
     for (let i = 0; i < lines.length; i++) {
-      const currentLine = lines[i];
+      let currentLine = lines[i];
       const nextLine = lines[i + 1];
       const prevLine = lines[i - 1];
+
+      // Birleşik karakterleri ayır (satır içinde)
+      // #####* -> ##### ve * olarak ayır
+      if (/(#{1,6})([\*\-\+])/.test(currentLine)) {
+        const match = currentLine.match(/(#{1,6})([\*\-\+].*)/);
+        if (match) {
+          processedLines.push(match[1].trim()); // Başlık
+          processedLines.push(''); // Boşluk
+          currentLine = match[2]; // Liste
+        }
+      }
 
       // Mevcut satırı ekle
       processedLines.push(currentLine);
@@ -42,7 +53,7 @@ export function MarkdownContent({ content, className = '' }: MarkdownContentProp
       const isCurrentHeading = /^#{1,6}\s/.test(currentLine);
       const isNextHeading = nextLine && /^#{1,6}\s/.test(nextLine);
       const isNextText = nextLine && nextLine.trim() && !isNextHeading && !nextLine.startsWith('*') && !nextLine.startsWith('-') && !nextLine.startsWith('+');
-      
+
       // Liste kontrolü
       const isCurrentList = /^[\*\-\+]\s/.test(currentLine);
       const isNextList = nextLine && /^[\*\-\+]\s/.test(nextLine);
@@ -70,11 +81,21 @@ export function MarkdownContent({ content, className = '' }: MarkdownContentProp
     // Sonucu birleştir
     cleanedContent = processedLines.join('\n');
 
+    // KRİTİK DÜZELTME: Birleşik karakterleri ayır
+    // #####* -> ##### *
+    cleanedContent = cleanedContent.replace(/(#{1,6})([\*\-\+])/g, '$1\n\n$2');
+
     // Başlık formatını düzelt (##Başlık -> ## Başlık)
     cleanedContent = cleanedContent.replace(/^(#{1,6})([^\s#])/gm, '$1 $2');
 
-    // Liste formatını düzelt (*madde -> * madde)
+    // Liste formatını düzelt (*madde -> * madde)  
     cleanedContent = cleanedContent.replace(/^([\*\-\+])([^\s])/gm, '$1 $2');
+
+    // Birleşik başlık-metin durumları (##Metin -> ## Metin)
+    cleanedContent = cleanedContent.replace(/(#{1,6})([A-ZÜĞŞÇÖİa-züğşçöı])/g, '$1 $2');
+
+    // Birleşik liste-metin durumları (*Metin -> * Metin)
+    cleanedContent = cleanedContent.replace(/([\*\-\+])([A-ZÜĞŞÇÖİa-züğşçöı])/g, '$1 $2');
 
     // Fazla boşlukları temizle
     cleanedContent = cleanedContent.replace(/\n{3,}/g, '\n\n');
@@ -86,12 +107,25 @@ export function MarkdownContent({ content, className = '' }: MarkdownContentProp
 
   // Debug için - geliştirme sırasında görmek için
   if (process.env.NODE_ENV === 'development') {
-    console.log('Original content:', content.substring(0, 200) + '...');
-    console.log('Cleaned content:', cleanedContent.substring(0, 200) + '...');
+    console.log('🔍 MARKDOWN DEBUG:');
+    console.log('Original (first 300 chars):', content.substring(0, 300));
+    console.log('Cleaned (first 300 chars):', cleanedContent.substring(0, 300));
 
-    // Test: Başlık ve paragraf arasında boşluk var mı?
-    const hasProperSpacing = /#{1,6}[^\n]*\n\n[^#]/.test(cleanedContent);
-    console.log('Has proper heading spacing:', hasProperSpacing);
+    // Birleşik karakter kontrolü
+    const hasMergedChars = /(#{1,6}[\*\-\+])/.test(content);
+    console.log('❌ Has merged chars (like #####*):', hasMergedChars);
+
+    // Düzeltme sonrası kontrol
+    const stillHasMerged = /(#{1,6}[\*\-\+])/.test(cleanedContent);
+    console.log('✅ Still has merged after cleaning:', stillHasMerged);
+
+    // Başlık kontrolü
+    const headings = cleanedContent.match(/^#{1,6}\s.*/gm);
+    console.log('📝 Found headings:', headings?.length || 0);
+
+    // Liste kontrolü  
+    const lists = cleanedContent.match(/^[\*\-\+]\s.*/gm);
+    console.log('📋 Found lists:', lists?.length || 0);
   }
 
   return (
