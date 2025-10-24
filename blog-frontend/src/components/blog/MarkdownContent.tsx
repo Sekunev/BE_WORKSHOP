@@ -33,7 +33,6 @@ export function MarkdownContent({ content, className = '' }: MarkdownContentProp
     for (let i = 0; i < lines.length; i++) {
       let currentLine = lines[i];
       const nextLine = lines[i + 1];
-      const prevLine = lines[i - 1];
 
       // Birleşik karakterleri ayır (satır içinde)
       // #####* -> ##### ve * olarak ayır
@@ -105,27 +104,20 @@ export function MarkdownContent({ content, className = '' }: MarkdownContentProp
 
   const cleanedContent = cleanMarkdownContent(content);
 
-  // Debug için - geliştirme sırasında görmek için
-  if (process.env.NODE_ENV === 'development') {
+  // Debug için - sadece geliştirme ortamında
+  if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
     console.log('🔍 MARKDOWN DEBUG:');
-    console.log('Original (first 300 chars):', content.substring(0, 300));
-    console.log('Cleaned (first 300 chars):', cleanedContent.substring(0, 300));
 
     // Birleşik karakter kontrolü
     const hasMergedChars = /(#{1,6}[\*\-\+])/.test(content);
-    console.log('❌ Has merged chars (like #####*):', hasMergedChars);
-
-    // Düzeltme sonrası kontrol
     const stillHasMerged = /(#{1,6}[\*\-\+])/.test(cleanedContent);
-    console.log('✅ Still has merged after cleaning:', stillHasMerged);
 
-    // Başlık kontrolü
-    const headings = cleanedContent.match(/^#{1,6}\s.*/gm);
-    console.log('📝 Found headings:', headings?.length || 0);
-
-    // Liste kontrolü  
-    const lists = cleanedContent.match(/^[\*\-\+]\s.*/gm);
-    console.log('📋 Found lists:', lists?.length || 0);
+    if (hasMergedChars || stillHasMerged) {
+      console.log('❌ Has merged chars:', hasMergedChars);
+      console.log('✅ Still merged after cleaning:', stillHasMerged);
+      console.log('Original sample:', content.substring(0, 200));
+      console.log('Cleaned sample:', cleanedContent.substring(0, 200));
+    }
   }
 
   return (
@@ -134,58 +126,58 @@ export function MarkdownContent({ content, className = '' }: MarkdownContentProp
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight]}
         components={{
-          // Başlıklar - daha küçük fontlar
+          // Başlıklar - optimize edilmiş boşluklar
           h1: ({ children, ...props }) => (
-            <h1 className="text-2xl font-bold mb-4 mt-6 text-gray-900" {...props}>
+            <h1 className="text-3xl font-bold mb-6 mt-8 text-gray-900 leading-tight" {...props}>
               {children}
             </h1>
           ),
           h2: ({ children, ...props }) => (
-            <h2 className="text-xl font-bold mb-3 mt-5 text-gray-900 border-b border-gray-200 pb-1" {...props}>
+            <h2 className="text-2xl font-bold mb-4 mt-8 text-gray-900 border-b border-gray-200 pb-2" {...props}>
               {children}
             </h2>
           ),
           h3: ({ children, ...props }) => (
-            <h3 className="text-lg font-bold mb-2 mt-4 text-gray-900" {...props}>
+            <h3 className="text-xl font-bold mb-3 mt-6 text-gray-900" {...props}>
               {children}
             </h3>
           ),
           h4: ({ children, ...props }) => (
-            <h4 className="text-base font-bold mb-2 mt-3 text-gray-900" {...props}>
+            <h4 className="text-lg font-bold mb-3 mt-5 text-gray-900" {...props}>
               {children}
             </h4>
           ),
           h5: ({ children, ...props }) => (
-            <h5 className="text-sm font-bold mb-2 mt-3 text-gray-900" {...props}>
+            <h5 className="text-base font-bold mb-2 mt-4 text-gray-900" {...props}>
               {children}
             </h5>
           ),
           h6: ({ children, ...props }) => (
-            <h6 className="text-sm font-bold mb-2 mt-3 text-gray-900" {...props}>
+            <h6 className="text-base font-bold mb-2 mt-4 text-gray-900" {...props}>
               {children}
             </h6>
           ),
 
-          // Paragraflar
+          // Paragraflar - daha iyi boşluk ve okunabilirlik
           p: ({ children, ...props }) => (
-            <p className="mb-3 text-gray-700 leading-relaxed text-base" {...props}>
+            <p className="mb-4 text-gray-700 leading-relaxed text-base" {...props}>
               {children}
             </p>
           ),
 
-          // Listeler
+          // Listeler - daha iyi görünüm
           ul: ({ children, ...props }) => (
-            <ul className="list-disc list-inside mb-3 space-y-1 ml-4 text-gray-700" {...props}>
+            <ul className="list-disc list-outside mb-4 space-y-2 ml-6 text-gray-700" {...props}>
               {children}
             </ul>
           ),
           ol: ({ children, ...props }) => (
-            <ol className="list-decimal list-inside mb-3 space-y-1 ml-4 text-gray-700" {...props}>
+            <ol className="list-decimal list-outside mb-4 space-y-2 ml-6 text-gray-700" {...props}>
               {children}
             </ol>
           ),
           li: ({ children, ...props }) => (
-            <li className="ml-1" {...props}>
+            <li className="leading-relaxed" {...props}>
               {children}
             </li>
           ),
