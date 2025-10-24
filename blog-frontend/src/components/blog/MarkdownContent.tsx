@@ -26,54 +26,60 @@ export function MarkdownContent({ content, className = '' }: MarkdownContentProp
 
     let cleanedContent = content.trim();
 
-    // --- 1. Başlıkları (Headings) Düzelt ---
+    // Satırları ayır ve işle
+    const lines = cleanedContent.split('\n');
+    const processedLines: string[] = [];
 
-    // Başlıktan sonra boşluk ekle (örn: "##Başlık" -> "## Başlık")
+    for (let i = 0; i < lines.length; i++) {
+      const currentLine = lines[i];
+      const nextLine = lines[i + 1];
+      const prevLine = lines[i - 1];
+
+      // Mevcut satırı ekle
+      processedLines.push(currentLine);
+
+      // Başlık kontrolü (# ile başlayan satırlar)
+      const isCurrentHeading = /^#{1,6}\s/.test(currentLine);
+      const isNextHeading = nextLine && /^#{1,6}\s/.test(nextLine);
+      const isNextText = nextLine && nextLine.trim() && !isNextHeading && !nextLine.startsWith('*') && !nextLine.startsWith('-') && !nextLine.startsWith('+');
+      
+      // Liste kontrolü
+      const isCurrentList = /^[\*\-\+]\s/.test(currentLine);
+      const isNextList = nextLine && /^[\*\-\+]\s/.test(nextLine);
+
+      // Boşluk ekleme kuralları
+      if (currentLine.trim()) {
+        // 1. Başlık sonrası metin varsa boşluk ekle
+        if (isCurrentHeading && isNextText) {
+          processedLines.push('');
+        }
+        // 2. Metin sonrası başlık varsa boşluk ekle  
+        else if (!isCurrentHeading && !isCurrentList && isNextHeading) {
+          processedLines.push('');
+        }
+        // 3. Liste öncesi/sonrası boşluk ekle
+        else if (!isCurrentList && nextLine && /^[\*\-\+]\s/.test(nextLine)) {
+          processedLines.push('');
+        }
+        else if (isCurrentList && nextLine && !isNextList && nextLine.trim() && !isNextHeading) {
+          processedLines.push('');
+        }
+      }
+    }
+
+    // Sonucu birleştir
+    cleanedContent = processedLines.join('\n');
+
+    // Başlık formatını düzelt (##Başlık -> ## Başlık)
     cleanedContent = cleanedContent.replace(/^(#{1,6})([^\s#])/gm, '$1 $2');
 
-    // Birleşik başlıkları ayır (örn: "## ###" -> "###")
-    cleanedContent = cleanedContent.replace(/^(#{1,6})\s*#{1,6}/gm, '$1');
+    // Liste formatını düzelt (*madde -> * madde)
+    cleanedContent = cleanedContent.replace(/^([\*\-\+])([^\s])/gm, '$1 $2');
 
-    // KRITIK DÜZELTME: Başlık ve metin arasındaki boşlukları düzelt
-    // Metin + başlık arasına boşluk ekle
-    cleanedContent = cleanedContent.replace(/([.!?])\n(#{1,6}\s)/g, '$1\n\n$2');
-    cleanedContent = cleanedContent.replace(/([^\n])\n(#{1,6}\s)/g, '$1\n\n$2');
-
-    // Başlık + metin arasına boşluk ekle  
-    cleanedContent = cleanedContent.replace(/(#{1,6}[^\n]*)\n([A-ZÜĞŞÇÖİa-züğşçöı])/g, '$1\n\n$2');
-
-    // Soru işareti sonrası başlık için özel durum
-    cleanedContent = cleanedContent.replace(/(\?)\n(#{1,6})/g, '$1\n\n$2');
-
-    // --- 2. Liste Düzeltmeleri ---
-
-    // Liste elemanlarından sonra boşluk ekle (örn: "*madde" -> "* madde")
-    cleanedContent = cleanedContent.replace(/^(\*|\+|\-|\d+\.)\s*([^\s])/gm, '$1 $2');
-
-    // Liste öncesi boşluk ekle
-    cleanedContent = cleanedContent.replace(/([^\n])\n(\*|\+|\-|\d+\.)/g, '$1\n\n$2');
-
-    // Liste sonrası boşluk ekle
-    cleanedContent = cleanedContent.replace(/(\*|\+|\-|\d+\.[^\n]*)\n([^*\-+\d\n\s])/g, '$1\n\n$2');
-
-    // --- 3. Diğer Markdown Düzeltmeleri ---
-
-    // Kalın ve italik metinlerdeki gereksiz boşlukları temizle
-    cleanedContent = cleanedContent.replace(/\*\*\s+([^*]+?)\s+\*\*/g, '**$1**');
-    cleanedContent = cleanedContent.replace(/\*\s+([^*]+?)\s+\*/g, '*$1*');
-
-    // Linklerdeki gereksiz boşlukları temizle
-    cleanedContent = cleanedContent.replace(/\[([^\]]+?)\]\s+\(([^)]+?)\)/g, '[$1]($2)');
-
-    // --- 4. Nihai Temizlik ---
-
-    // Üç veya daha fazla boş satırı iki satıra düşür
+    // Fazla boşlukları temizle
     cleanedContent = cleanedContent.replace(/\n{3,}/g, '\n\n');
 
-    // Başlangıç ve bitişteki fazla boşlukları temizle
-    cleanedContent = cleanedContent.trim();
-
-    return cleanedContent;
+    return cleanedContent.trim();
   }
 
   const cleanedContent = cleanMarkdownContent(content);

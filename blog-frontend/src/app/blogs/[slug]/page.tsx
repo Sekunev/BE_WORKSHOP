@@ -9,11 +9,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { blogService, Blog } from '@/lib/services/blog';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { 
-  Calendar, 
-  Clock, 
-  Eye, 
-  Heart, 
+import {
+  Calendar,
+  Clock,
+  Eye,
+  Heart,
   ArrowLeft,
   Edit,
   Trash2,
@@ -170,7 +170,7 @@ export default function BlogDetailPage() {
                 </Badge>
               )}
             </div>
-            
+
             <p className="text-lg text-gray-600 mb-6">{blog.excerpt}</p>
 
             {/* Meta Info */}
@@ -212,7 +212,7 @@ export default function BlogDetailPage() {
                 <Heart className="mr-2 h-4 w-4" />
                 {blog.likeCount} Beğeni
               </Button>
-              
+
               <Button
                 variant="outline"
                 size="sm"
@@ -241,11 +241,11 @@ export default function BlogDetailPage() {
 
           {/* Content */}
           <div className="p-8">
-            <MarkdownContent 
+            <MarkdownContent
               content={blog.content}
               className="max-w-none"
             />
-            
+
             {/* AI Metadata */}
             {blog.aiGenerated && blog.aiMetadata && (
               <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg">
